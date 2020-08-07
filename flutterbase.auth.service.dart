@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fchat/flutterbase_v2/flutterbase.controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
@@ -36,6 +37,8 @@ class FlutterbaseAuthService {
           (await _auth.signInWithCredential(credential)).user;
       print("signed in " + user.displayName);
 
+      saveOrUpdateFirebaseUser(user);
+
       /// 파이어베이스에서 이미 로그인을 했으므로, GoogleSignIn 에서는 바로 로그아웃을 한다.
       /// GoogleSignIn 에서 로그아웃을 안하면, 다음에 로그인을 할 때, 다른 계정으로 로그인을 못한다.
       /// Logout immediately from `Google` so, the user can choose another
@@ -56,5 +59,30 @@ class FlutterbaseAuthService {
   logout() async {
     await _auth.signOut();
     _controller.update(['auth']);
+  }
+
+  saveOrUpdateFirebaseUser(FirebaseUser user) async {
+    if (user == null) return;
+
+    // Check is already sign up
+    final QuerySnapshot result = await Firestore.instance
+        .collection('users')
+        .where('id', isEqualTo: user.uid)
+        .getDocuments();
+    final List<DocumentSnapshot> documents = result.documents;
+    if (documents.length == 0) {
+      // Update data to server if new user
+      Firestore.instance.collection('users').document(user.uid).setData({
+        'nickname': user.displayName,
+        'photoUrl': user.photoUrl,
+        'id': user.uid
+      });
+    }
+
+    // SharedPreferences prefs;
+    // prefs = await SharedPreferences.getInstance();
+    // await prefs.setString('uid', user.uid);
+    // await prefs.setString('nickname', user.displayName);
+    // await prefs.setString('aboutMe', user.photoUrl);
   }
 }
