@@ -42,6 +42,7 @@ class FlutterbaseAuthService {
       final FirebaseUser user =
           (await _auth.signInWithCredential(credential)).user;
       print("signed in " + user.displayName);
+      print(user);
 
       // saveOrUpdateFirebaseUser(user);
 
@@ -279,6 +280,8 @@ class FlutterbaseAuthService {
           FacebookAuthProvider.getCredential(accessToken: result);
       final AuthResult authResult =
           await _auth.signInWithCredential(facebookAuthCred);
+      // saveOrUpdateFirebaseUser(authResult.user, account: 'facebook');
+      print(authResult.user);
       return authResult.user;
     } catch (e) {
       throw e;
