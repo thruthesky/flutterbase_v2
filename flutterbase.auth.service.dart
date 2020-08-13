@@ -154,6 +154,8 @@ class FlutterbaseAuthService {
       email: email.trim(),
       password: password,
     );
+
+    _controller.onLogin();
     return result.user;
   }
 
@@ -283,6 +285,8 @@ class FlutterbaseAuthService {
           await _auth.signInWithCredential(facebookAuthCred);
       // saveOrUpdateFirebaseUser(authResult.user, account: 'facebook');
       print(authResult.user);
+
+      _controller.onLogin();
       return authResult.user;
     } catch (e) {
       throw e;

@@ -51,6 +51,7 @@ class FlutterbaseController extends GetxController {
   _initAuthChange() async {
     _auth.onAuthStateChanged.listen(
       (FirebaseUser u) async {
+        print(u);
         user = u;
         if (u == null) {
           // print('EngineModel::onAuthStateChanged() user logged out');
