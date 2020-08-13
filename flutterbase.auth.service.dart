@@ -39,8 +39,9 @@ class FlutterbaseAuthService {
       final FirebaseUser user =
           (await _auth.signInWithCredential(credential)).user;
       print("signed in " + user.displayName);
+      print(user);
 
-      saveOrUpdateFirebaseUser(user);
+      saveOrUpdateFirebaseUser(user, account: 'google');
 
       /// 파이어베이스에서 이미 로그인을 했으므로, GoogleSignIn 에서는 바로 로그아웃을 한다.
       /// GoogleSignIn 에서 로그아웃을 안하면, 다음에 로그인을 할 때, 다른 계정으로 로그인을 못한다.
@@ -66,7 +67,7 @@ class FlutterbaseAuthService {
 
   /// When user logs in, the app can save extra information of the user.
   /// - The app may ask user to input his address.
-  saveOrUpdateFirebaseUser(FirebaseUser user) async {
+  saveOrUpdateFirebaseUser(FirebaseUser user, {String account = ''}) async {
     if (user == null) return;
 
     // Check is already sign up
@@ -77,11 +78,14 @@ class FlutterbaseAuthService {
     final List<DocumentSnapshot> documents = result.documents;
     if (documents.length == 0) {
       // Update data to server if new user
-      Firestore.instance.collection('users').document(user.uid).setData({
+      var data = {
+        'email': user.email,
         'nickname': user.displayName,
         'photoUrl': user.photoUrl,
-        'id': user.uid
-      });
+        'id': user.uid,
+        'account': account
+      };
+      Firestore.instance.collection('users').document(user.uid).setData(data);
     }
 
     // SharedPreferences prefs;
@@ -112,6 +116,9 @@ class FlutterbaseAuthService {
           FacebookAuthProvider.getCredential(accessToken: result);
       final AuthResult authResult =
           await _auth.signInWithCredential(facebookAuthCred);
+      saveOrUpdateFirebaseUser(authResult.user, account: 'facebook');
+      print(authResult.user);
+
       return authResult.user;
     } catch (e) {
       throw e;
