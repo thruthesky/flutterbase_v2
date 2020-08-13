@@ -1,5 +1,5 @@
-import 'package:fchat/flutterbase_v2/flutterbase.auth.service.dart';
-import 'package:fchat/flutterbase_v2/flutterbase.controller.dart';
+import '../../flutterbase.auth.service.dart';
+import '../../flutterbase.controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/state_manager.dart';
 

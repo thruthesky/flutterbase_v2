@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fchat/flutterbase_v2/flutterbase.controller.dart';
+import './flutterbase.controller.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 

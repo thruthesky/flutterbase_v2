@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fchat/flutter_library/library.dart';
-import 'package:fchat/flutterbase_v2/flutterbase.controller.dart';
-import 'package:fchat/flutterbase_v2/flutterbase.defines.dart';
+import '../flutter_library/library.dart';
+import '../flutterbase_v2/flutterbase.controller.dart';
+import '../flutterbase_v2/flutterbase.defines.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -51,6 +51,7 @@ class FlutterbaseAuthService {
       /// Logout immediately from `Google` so, the user can choose another
       /// Google account on next login.
       await _googleSignIn.signOut();
+      _controller.onLogin();
       return user;
     } on PlatformException catch (e) {
       final code = e.code.toLowerCase();

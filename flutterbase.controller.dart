@@ -84,4 +84,10 @@ class FlutterbaseController extends GetxController {
       },
     );
   }
+
+  /// This method is called when a user logs in.
+  /// - The user may be logged in with Google or Facebook, Apple, or other account.
+  onLogin() {
+    update(['user']);
+  }
 }

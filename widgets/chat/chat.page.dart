@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fchat/flutterbase_v2/flutterbase.controller.dart';
-import 'package:fchat/flutterbase_v2/widgets/chat/chat.input_box.dart';
-import 'package:fchat/flutterbase_v2/widgets/chat/chat.message.dart';
+import '../../flutterbase.controller.dart';
+import './chat.input_box.dart';
+import './chat.message.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
