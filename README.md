@@ -9,6 +9,11 @@
 
 ## Coding guide
 
+* Most of the codes are derived from [Flutterbase Version 1](https://github.com/thruthesky/flutterbase). You can refer to it for details.
+
 * See the code in [fchat](https://github.com/thruthesky/fchat) app.
 
 
+## Installation
+
+* For chat functionality,

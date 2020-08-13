@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/state_manager.dart';
 
 class FlutterbaseController extends GetxController {
@@ -18,6 +19,13 @@ class FlutterbaseController extends GetxController {
 
   FlutterbaseController() {
     _initAuthChange();
+  }
+
+  int facebookAppId;
+  String facebookRedirectUrl;
+  setLoginForFacebook({@required int appId, @required String redirectUrl}) {
+    facebookAppId = appId;
+    facebookRedirectUrl = redirectUrl;
   }
 
   /// When user logged in, it return true.
