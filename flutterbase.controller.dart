@@ -14,19 +14,26 @@ class FlutterbaseController extends GetxController {
   /// - `user` must be changed by `onAuthStateChanged` only.
   ///   To handle user login.obs
   ///   When user logs out or didn't logged in, the user will login as `Anonymouse` by `onAuthStateChagned`
-  FirebaseUser _user;
-  FirebaseUser get user => _user;
+  FirebaseUser user;
+  // FirebaseUser get user => _user;
 
-  FlutterbaseController() {
+  FlutterbaseController({
+    this.facebookAppId,
+    this.facebookRedirectUrl,
+    this.kakaotalkClientId,
+    this.kakaotalkJavascriptClientId,
+  }) {
     _initAuthChange();
   }
 
+  String kakaotalkClientId;
+  String kakaotalkJavascriptClientId;
   int facebookAppId;
   String facebookRedirectUrl;
-  setLoginForFacebook({@required int appId, @required String redirectUrl}) {
-    facebookAppId = appId;
-    facebookRedirectUrl = redirectUrl;
-  }
+  // setLoginForFacebook({@required int appId, @required String redirectUrl}) {
+  //   facebookAppId = appId;
+  //   facebookRedirectUrl = redirectUrl;
+  // }
 
   /// When user logged in, it return true.
   ///
@@ -44,7 +51,7 @@ class FlutterbaseController extends GetxController {
   _initAuthChange() async {
     _auth.onAuthStateChanged.listen(
       (FirebaseUser u) async {
-        _user = u;
+        user = u;
         if (u == null) {
           // print('EngineModel::onAuthStateChanged() user logged out');
           _auth.signInAnonymously();

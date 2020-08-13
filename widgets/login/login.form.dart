@@ -21,6 +21,24 @@ class _LoginFormState extends State<LoginForm> {
             builder: (_) => _.loggedIn
                 ? Column(
                     children: [
+                      SizedBox(height: 20),
+                      Container(
+                        width: 64,
+                        height: 64,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: Image.network(
+                              _.user.photoUrl,
+                              width: 64,
+                              height: 64,
+                            ).image,
+                          ),
+                          shape: BoxShape.circle,
+                          boxShadow: [BoxShadow(blurRadius: 7)],
+                          color: Colors.white30,
+                        ),
+                      ),
+                      SizedBox(height: 20),
                       Text('Logged in as ${_.user.displayName}'),
                       RaisedButton(
                         child: Text('Logout'),
@@ -50,7 +68,11 @@ class _LoginFormState extends State<LoginForm> {
               ),
               RaisedButton(
                 onPressed: () async {
-                  auth.loginWithGoogleAccount();
+                  try {
+                    auth.loginWithKakaotalkAccount();
+                  } catch (e) {
+                    print('e: $e');
+                  }
                   setState(() {});
                 },
                 child: Text('Kakaotalk'),

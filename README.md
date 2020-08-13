@@ -16,4 +16,18 @@
 
 ## Installation
 
-* For chat functionality,
+### Login
+
+* Enable `Google` in firebase if you want users to login with google account.
+* To enable `Facebook` login
+  * You need to create and set an App in Facebook developers account.
+  * And then update `Info.plist` for `flutter_webview_plugin: ^0.3.11`
+  * And enable `Facebook` in firebase.
+
+* To enable `Kakaotalk` login
+  * You need to create and set an App in Kakaotalk developers account.
+  * And set for `kakao_flutter_sdk` and its dependencies.
+  * And you need to enable `Email/Password` under Firebase > Authentication > Sign-in method.
+
+### Chat
+
