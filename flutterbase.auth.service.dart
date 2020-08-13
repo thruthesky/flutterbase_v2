@@ -118,7 +118,6 @@ class FlutterbaseAuthService {
           await _auth.signInWithCredential(facebookAuthCred);
       saveOrUpdateFirebaseUser(authResult.user, account: 'facebook');
       print(authResult.user);
-
       return authResult.user;
     } catch (e) {
       throw e;
