@@ -29,5 +29,24 @@
   * And set for `kakao_flutter_sdk` and its dependencies.
   * And you need to enable `Email/Password` under Firebase > Authentication > Sign-in method.
 
+
+* When there is platform error, `FlutterbaseAuthService::onPlatformException()` will be called and the error will be thrown to parent. You can catch the error like below.
+
+``` dart
+onTap: () async {
+  try {
+    await auth.loginWithFacebookAccount(context: context);
+  } catch (e) {
+    print('catch on facebok login');
+    print(e);
+  }
+},
+```
+
 ### Chat
+
+
+## Bugs & Known Problems
+
+* Once a user logged with facebook account, he cannot switch to another facebook account.
 

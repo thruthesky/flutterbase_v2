@@ -13,3 +13,6 @@ const String DISPLAYNAME_IS_EMPTY = 'flutterbase/displayname-is-empty';
 const String FAILED_TO_REGISTER = 'flutterbase/failed-to-register';
 
 const String EMAIL_CANNOT_BY_CHANGED = 'email-cannot-be-changed';
+
+const String ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL =
+    'ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL';
