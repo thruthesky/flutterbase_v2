@@ -118,13 +118,14 @@ class _ChatWidgetState extends State<ChatWidget> {
     //// RegExp("[ A-Za-z0-9`~!@#\$%^&*()\\-=+{}\\[\\];:\'\"|\\\\,<.>/?]");
     ///
     String allowed =
-        " `1234567890-=~!@#\$%^&*()_+qwertyuiop[]\\QWERTYUIOP{}|asdfghjkl;\ASDFGHJKL:\"zxcvbnm,./ZXCVBNM<>?";
+        "‘’“” `1234567890-=~!@#\$%^&*()_+qwertyuiop[]\\QWERTYUIOP{}|asdfghjkl;\ASDFGHJKL:\"zxcvbnm,./ZXCVBNM<>?";
 
     List<String> chars = content.split('');
     for (String char in chars) {
       if (allowed.indexOf(char) > -1) {
         /// fine
       } else {
+        print('char: $char');
         return false;
       }
     }
