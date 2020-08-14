@@ -41,6 +41,7 @@ class FlutterbaseAuthService {
 
       final FirebaseUser user =
           (await _auth.signInWithCredential(credential)).user;
+
       print("signed in " + user.displayName);
       print(user);
 
@@ -51,7 +52,6 @@ class FlutterbaseAuthService {
       /// Logout immediately from `Google` so, the user can choose another
       /// Google account on next login.
       await _googleSignIn.signOut();
-      _controller.onLogin();
       return user;
     } on PlatformException catch (e) {
       final code = e.code.toLowerCase();
@@ -129,8 +129,10 @@ class FlutterbaseAuthService {
 
   /// 사용자 로그아웃을 하고 `notifyListeners()` 를 한다. `user` 는 Listeners 에서 자동 업데이트된다.
   logout() async {
-    await _auth.signOut();
-    _controller.update(['auth']);
+    _controller.logout();
+
+    // await _auth.signOut();
+    // _controller.update(['auth']);
   }
 
   /// Logs in with Email/Password into Firebase Auth.

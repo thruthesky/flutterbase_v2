@@ -17,7 +17,7 @@ class _LoginFormState extends State<LoginForm> {
       child: Column(
         children: [
           GetBuilder<FlutterbaseController>(
-            id: 'auth',
+            // id: 'user',
             builder: (_) => _.loggedIn
                 ? Column(
                     children: [
