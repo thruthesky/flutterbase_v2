@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:englishfun_v2/app.service.dart';
 import '../../flutterbase.controller.dart';
@@ -28,9 +30,11 @@ class _ChatWidgetState extends State<ChatWidget> {
   @override
   void initState() {
     super.initState();
-    // if (firebaseController.notLoggedIn) {
-    //   AppService.alert('Please Login to chat.');
-    // }
+    if (firebaseController.notLoggedIn) {
+      Timer(Duration(seconds: 1), () {
+        Get.snackbar('Must Login first', 'Please Login to chat.');
+      });
+    }
 
     initFirebase();
   }
