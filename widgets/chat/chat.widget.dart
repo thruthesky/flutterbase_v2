@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:englishfun_v2/app.service.dart';
+import 'package:englishfun_v2/services/routes.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import '../../flutterbase.controller.dart';
 import 'chat.input_box.dart';
 import 'chat.message.dart';
@@ -42,10 +44,10 @@ class _ChatWidgetState extends State<ChatWidget> {
       });
     }
 
-    initFirebase();
+    initChatRoom();
   }
 
-  initFirebase() async {
+  initChatRoom() async {
     /// Get the last 30 messagese from chat room.
     QuerySnapshot chats = await chatRoom
         .orderBy('timestamp', descending: true)
@@ -55,6 +57,7 @@ class _ChatWidgetState extends State<ChatWidget> {
     ///
     final docs = chats.documents;
 
+    /// Save last 30 into variable.
     if (docs.length > 0) {
       docs.forEach(
         (doc) {
@@ -66,6 +69,7 @@ class _ChatWidgetState extends State<ChatWidget> {
       setState(() {});
     }
 
+    /// listen for a new message.
     chatRoom.orderBy('timestamp', descending: true).limit(1).snapshots().listen(
           (data) => data.documents.forEach(
             (doc) {
@@ -109,12 +113,14 @@ class _ChatWidgetState extends State<ChatWidget> {
     );
   }
 
-  void onSendMessage() {
+  void onSendMessage() async {
     if (firebaseController.notLoggedIn) {
-      Get.snackbar('Must Login first', 'Please Login to chat.');
-      return;
+      return alertLogin();
     }
-    AppService.alert('Please Login to chat.');
+
+    /// TODO: English only chat.
+    /// allow ascii code only. from a-zA-Z0-9, !@#$%^&&**{|}|}><?><?>/.,/.,
+    ///
     String content = textEditingController.text;
     if (content.trim() != '') {
       textEditingController.clear();
@@ -132,5 +138,30 @@ class _ChatWidgetState extends State<ChatWidget> {
     } else {
       Get.snackbar('Nothing to send', '');
     }
+  }
+
+  alertLogin() {
+    Get.dialog(PlatformAlertDialog(
+      title: Text('로그인'),
+      content: Text('영어 채팅을 하기 위해서는 로그인을 해야 합니다. 로그인을 하시겠습니까?'),
+      actions: [
+        PlatformButton(
+          onPressed: () {
+            print('yes');
+            Get.back();
+            Get.toNamed(Routes.login);
+          },
+          child: Text('Yes'),
+        ),
+        PlatformButton(
+          onPressed: () {
+            print('No');
+            Get.back();
+          },
+          child: Text('No'),
+        ),
+      ],
+    ));
+    return;
   }
 }
