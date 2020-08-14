@@ -25,7 +25,7 @@ class FlutterbaseAuthService {
   /// Login with Google account.
   ///
   /// @note If the user cancels, then `null` is returned
-  Future<FirebaseUser> loginWithGoogleAccount() async {
+  Future<void> loginWithGoogleAccount() async {
     try {
       final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
@@ -53,7 +53,6 @@ class FlutterbaseAuthService {
       /// Logout immediately from `Google` so, the user can choose another
       /// Google account on next login.
       await _googleSignIn.signOut();
-      return user;
     } on PlatformException catch (e) {
       await onPlatformException(e);
       // print('ecode: ${e.code}');
@@ -63,6 +62,37 @@ class FlutterbaseAuthService {
       // print('loginWithGoogleAccount::');
       // print(e);
       // throw e.message;
+    }
+  }
+
+  /// Login with Facebook Account
+  ///
+  /// ```dart
+  /// ```
+  ///
+  Future<void> loginWithFacebookAccount(
+      {@required BuildContext context}) async {
+    String result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => CustomWebViewForFacebookLogin(
+                selectedUrl:
+                    'https://www.facebook.com/dialog/oauth?client_id=${_controller.facebookAppId}&redirect_uri=${_controller.facebookRedirectUrl}&response_type=token&scope=email,public_profile,',
+              ),
+          maintainState: true),
+    );
+
+    if (result == null) throw FAILED_ON_FACEBOOK_LOGIN;
+    try {
+      final facebookAuthCred =
+          FacebookAuthProvider.getCredential(accessToken: result);
+      final AuthResult authResult =
+          await _auth.signInWithCredential(facebookAuthCred);
+      print(authResult.user);
+    } on PlatformException catch (e) {
+      await onPlatformException(e);
+    } catch (e) {
+      await onCatch(e);
     }
   }
 
@@ -160,7 +190,6 @@ class FlutterbaseAuthService {
       password: password,
     );
 
-    _controller.onLogin();
     return result.user;
   }
 
@@ -236,6 +265,12 @@ class FlutterbaseAuthService {
 
   onPlatformException(e) async {
     print('onPlatformException():');
+    print(e.code);
+    if (e.code == ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL) {
+      Get.snackbar('중복 소셜 로그인',
+          '동일한 메일 주소의 다른 소셜 아이디로 이미 로그인되어져 있습니다. 다른 소셜아이디로 로그인을 하세요.',
+          duration: Duration(seconds: 10));
+    }
     print(e);
     throw e;
   }
@@ -269,39 +304,6 @@ class FlutterbaseAuthService {
       } else {
         await onPlatformException(e);
       }
-    } catch (e) {
-      await onCatch(e);
-    }
-  }
-
-  /// Login with Facebook Account
-  ///
-  ///
-  Future<FirebaseUser> loginWithFacebookAccount(
-      {@required BuildContext context}) async {
-    String result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => CustomWebViewForFacebookLogin(
-                selectedUrl:
-                    'https://www.facebook.com/dialog/oauth?client_id=${_controller.facebookAppId}&redirect_uri=${_controller.facebookRedirectUrl}&response_type=token&scope=email,public_profile,',
-              ),
-          maintainState: true),
-    );
-
-    if (result == null) throw FAILED_ON_FACEBOOK_LOGIN;
-    try {
-      final facebookAuthCred =
-          FacebookAuthProvider.getCredential(accessToken: result);
-      final AuthResult authResult =
-          await _auth.signInWithCredential(facebookAuthCred);
-      // saveOrUpdateFirebaseUser(authResult.user, account: 'facebook');
-      print(authResult.user);
-
-      _controller.onLogin();
-      return authResult.user;
-    } on PlatformException catch (e) {
-      await onPlatformException(e);
     } catch (e) {
       await onCatch(e);
     }

@@ -95,7 +95,7 @@ class FlutterbaseController extends GetxController {
   /// - The user may be logged in with Google or Facebook, Apple, or other account.
   /// - It is invoked by `onAuthStateChanged`
   onLogin() {
-    print(' onLogin()');
+    print('--> on Login');
   }
 
   /// - It is invoked by `onAuthStateChanged`
