@@ -39,8 +39,9 @@ class FlutterbaseAuthService {
         idToken: googleAuth.idToken,
       );
 
-      final FirebaseUser user =
-          (await _auth.signInWithCredential(credential)).user;
+      AuthResult authResult = await _auth.signInWithCredential(credential);
+
+      final FirebaseUser user = authResult.user;
 
       print("signed in " + user.displayName);
       print(user);
@@ -54,12 +55,14 @@ class FlutterbaseAuthService {
       await _googleSignIn.signOut();
       return user;
     } on PlatformException catch (e) {
-      final code = e.code.toLowerCase();
-      throw code;
+      await onPlatformException(e);
+      // print('ecode: ${e.code}');
+      // final code = e.code.toLowerCase();
+      // throw code;
     } catch (e) {
-      print('loginWithGoogleAccount::');
-      print(e);
-      throw e.message;
+      // print('loginWithGoogleAccount::');
+      // print(e);
+      // throw e.message;
     }
   }
 
@@ -231,6 +234,16 @@ class FlutterbaseAuthService {
     // userDocument = await profile();
   }
 
+  onPlatformException(e) async {
+    print('onPlatformException():');
+    print(e);
+    throw e;
+  }
+
+  onCatch(e) async {
+    throw e;
+  }
+
   /// 회원 로그인을 먼저 시도하고, 가입이 되어져 있지 않으면 가입을 한다.
   ///
   ///
@@ -254,13 +267,10 @@ class FlutterbaseAuthService {
         print('Not registered. Going to register');
         await register(data);
       } else {
-        print('Error on login or profile update:');
-        print(e);
-        throw e;
+        await onPlatformException(e);
       }
     } catch (e) {
-      print('what error error: $e');
-      throw e;
+      await onCatch(e);
     }
   }
 
@@ -290,8 +300,10 @@ class FlutterbaseAuthService {
 
       _controller.onLogin();
       return authResult.user;
+    } on PlatformException catch (e) {
+      await onPlatformException(e);
     } catch (e) {
-      throw e;
+      await onCatch(e);
     }
   }
 }
