@@ -13,14 +13,20 @@ class ChatWidget extends StatefulWidget {
 }
 
 class _ChatWidgetState extends State<ChatWidget> {
-  CollectionReference chatRoom = Firestore.instance.collection('chatRoom');
-
+  ///
   final FlutterbaseController firebaseController = Get.find();
 
+  ///
+  CollectionReference chatRoom = Firestore.instance.collection('chatRoom');
+
+  ///
   final TextEditingController textEditingController =
       new TextEditingController();
+
+  ///
   final ScrollController listScrollController = new ScrollController();
 
+  ///
   Map<String, dynamic> args = Get.arguments;
 
   var messages = [];
