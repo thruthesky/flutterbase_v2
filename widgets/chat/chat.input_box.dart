@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ChatInputBox extends StatefulWidget {
   ChatInputBox({
@@ -23,12 +24,32 @@ class _ChatInputBoxState extends State<ChatInputBox> {
           // Edit text
           Flexible(
             child: TextField(
+              inputFormatters: [
+                new FilteringTextInputFormatter.allow(RegExp(
+                    // "[!-~]"
+                    "[ A-Za-z0-9`~!@#\$%^&*()\\-=+{}\\[\\];:\'\"|\\\\,<.>/?]"))
+              ],
               style: TextStyle(fontSize: 16.0),
               controller: widget.controller,
               decoration: InputDecoration.collapsed(
                 hintText: 'Type your message...',
               ),
-              // focusNode: focusNode,
+              onChanged: (value) {
+                // Regex.Replace(
+                //     value,
+                //     "[ A-Za-z0-9`~!@#\$%^&*()\\-=+{}\\[\\];:\'\"|\\\\,<.>/?]",
+                //     '');
+                // String newValue = value.replaceAllMapped(
+                //     RegExp(
+                //         "[ A-Za-z0-9`~!@#\$%^&*()\\-=+{}\\[\\];:\'\"|\\\\,<.>/?]"),
+                //     (match) {
+                //   print(match.group(0));
+                //   return '"${match.group(0)}"';
+                // });
+
+                // print(value);
+                // print(newValue);
+              },
             ),
           ),
 
