@@ -84,8 +84,9 @@ class FlutterbaseController extends GetxController {
             // notify();
           }
           // update(['user']);
-          update();
+          // update();
         }
+        update();
       },
     );
   }

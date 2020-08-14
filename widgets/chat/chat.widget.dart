@@ -1,17 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:englishfun_v2/app.service.dart';
 import '../../flutterbase.controller.dart';
-import './chat.input_box.dart';
-import './chat.message.dart';
+import 'chat.input_box.dart';
+import 'chat.message.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class ChatPage extends StatefulWidget {
+class ChatWidget extends StatefulWidget {
   @override
-  _ChatPageState createState() => _ChatPageState();
+  _ChatWidgetState createState() => _ChatWidgetState();
 }
 
-class _ChatPageState extends State<ChatPage> {
+class _ChatWidgetState extends State<ChatWidget> {
   CollectionReference chatRoom = Firestore.instance.collection('chatRoom');
 
   final FlutterbaseController firebaseController = Get.find();
@@ -27,6 +28,10 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
+    // if (firebaseController.notLoggedIn) {
+    //   AppService.alert('Please Login to chat.');
+    // }
+
     initFirebase();
   }
 
@@ -73,36 +78,33 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(
-          'Chat Room',
-        ),
-        centerTitle: true,
-      ),
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            Flexible(
-              child: ListView.builder(
-                padding: EdgeInsets.all(10.0),
-                itemBuilder: (context, index) => ChatMessage(messages[index]),
-                itemCount: messages.length,
-                reverse: true,
-                controller: listScrollController,
-              ),
+    return SafeArea(
+      child: Column(
+        children: <Widget>[
+          Flexible(
+            child: ListView.builder(
+              padding: EdgeInsets.all(10.0),
+              itemBuilder: (context, index) => ChatMessage(messages[index]),
+              itemCount: messages.length,
+              reverse: true,
+              controller: listScrollController,
             ),
-            ChatInputBox(
-              controller: textEditingController,
-              onPressed: onSendMessage,
-            )
-          ],
-        ),
+          ),
+          ChatInputBox(
+            controller: textEditingController,
+            onPressed: onSendMessage,
+          )
+        ],
       ),
     );
   }
 
   void onSendMessage() {
+    if (firebaseController.notLoggedIn) {
+      Get.snackbar('Must Login first', 'Please Login to chat.');
+      return;
+    }
+    AppService.alert('Please Login to chat.');
     String content = textEditingController.text;
     if (content.trim() != '') {
       textEditingController.clear();
