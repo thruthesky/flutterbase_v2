@@ -24,35 +24,13 @@ class _ChatInputBoxState extends State<ChatInputBox> {
           // Edit text
           Flexible(
             child: TextField(
-              inputFormatters: [
-                new FilteringTextInputFormatter.allow(RegExp(
-                    // "[!-~]"
-                    "[ A-Za-z0-9`~!@#\$%^&*()\\-=+{}\\[\\];:\'\"|\\\\,<.>/?]"))
-              ],
               style: TextStyle(fontSize: 16.0),
               controller: widget.controller,
               decoration: InputDecoration.collapsed(
                 hintText: 'Type your message...',
               ),
-              onChanged: (value) {
-                // Regex.Replace(
-                //     value,
-                //     "[ A-Za-z0-9`~!@#\$%^&*()\\-=+{}\\[\\];:\'\"|\\\\,<.>/?]",
-                //     '');
-                // String newValue = value.replaceAllMapped(
-                //     RegExp(
-                //         "[ A-Za-z0-9`~!@#\$%^&*()\\-=+{}\\[\\];:\'\"|\\\\,<.>/?]"),
-                //     (match) {
-                //   print(match.group(0));
-                //   return '"${match.group(0)}"';
-                // });
-
-                // print(value);
-                // print(newValue);
-              },
             ),
           ),
-
           // Button send message
           IconButton(
               padding: EdgeInsets.all(12.0),

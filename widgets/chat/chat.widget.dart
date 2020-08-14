@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:englishfun_v2/app.service.dart';
 import 'package:englishfun_v2/services/routes.dart';
+import 'package:englishfun_v2/services/texts.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import '../../flutterbase.controller.dart';
 import 'chat.input_box.dart';
@@ -113,6 +114,23 @@ class _ChatWidgetState extends State<ChatWidget> {
     );
   }
 
+  bool englishOnly(String content) {
+    //// RegExp("[ A-Za-z0-9`~!@#\$%^&*()\\-=+{}\\[\\];:\'\"|\\\\,<.>/?]");
+    ///
+    String allowed =
+        " `1234567890-=~!@#\$%^&*()_+qwertyuiop[]\\QWERTYUIOP{}|asdfghjkl;\ASDFGHJKL:\"zxcvbnm,./ZXCVBNM<>?";
+
+    List<String> chars = content.split('');
+    for (String char in chars) {
+      if (allowed.indexOf(char) > -1) {
+        /// fine
+      } else {
+        return false;
+      }
+    }
+    return true;
+  }
+
   void onSendMessage() async {
     if (firebaseController.notLoggedIn) {
       return alertLogin();
@@ -122,6 +140,23 @@ class _ChatWidgetState extends State<ChatWidget> {
     /// allow ascii code only. from a-zA-Z0-9, !@#$%^&&**{|}|}><?><?>/.,/.,
     ///
     String content = textEditingController.text;
+
+    if (!englishOnly(content.trim())) {
+      Get.dialog(
+        PlatformAlertDialog(
+          title: Text('English Chat'),
+          content: Text('This is English chat room. Please type English only.'),
+          actions: [
+            PlatformButton(
+              child: Text(Tx.ok),
+              onPressed: () => Get.back(),
+            )
+          ],
+        ),
+      );
+      return;
+    }
+
     if (content.trim() != '') {
       textEditingController.clear();
       var data = {
