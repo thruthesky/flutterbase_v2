@@ -62,6 +62,7 @@ class FlutterbaseController extends GetxController {
 
           /// 실제 사용자로 로그인을 한 경우, Anonymous 는 제외
           if (loggedIn) {
+            onLogin();
             try {
               // userDocument = await profile();
               // print('userDocument: $userDocument, email: ${user.email}');
@@ -76,11 +77,14 @@ class FlutterbaseController extends GetxController {
             print('User has logged in anonymouse');
             print('isAnonymous: ${user.isAnonymous}');
 
+            onLogout();
+
             /// 로그 아웃을 한 경우 (Anonymous 로 로그인 한 경우 포함)
             // userDocument = FlutterbaseUser();
             // notify();
           }
-          update(['auth']);
+          // update(['user']);
+          update();
         }
       },
     );
@@ -88,7 +92,21 @@ class FlutterbaseController extends GetxController {
 
   /// This method is called when a user logs in.
   /// - The user may be logged in with Google or Facebook, Apple, or other account.
+  /// - It is invoked by `onAuthStateChanged`
   onLogin() {
-    update(['user']);
+    print(' onLogin()');
+  }
+
+  /// - It is invoked by `onAuthStateChanged`
+  onLogout() {
+    print(' onLogout()');
+  }
+
+  /// User logs out
+  /// - `update()` will be called by `onAuthStateChanged`
+  logout() async {
+    var _auth = FirebaseAuth.instance;
+    await _auth.signOut();
+    print(' logout()');
   }
 }
