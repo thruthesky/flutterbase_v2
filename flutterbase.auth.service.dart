@@ -131,17 +131,19 @@ class FlutterbaseAuthService {
 
       ////
       String refreshedToken = token.refreshToken;
-      print('refreshedToken: $refreshedToken');
+      print('----> refreshedToken: $refreshedToken');
 
       /// Get Kakaotalk user info
       kakao.User user = await kakao.UserApi.instance.me();
-
+      print(user.properties);
       Map<String, String> data = {
         'email': 'kakaotalk${user.id}@kakao.com',
         'password': 'Settings.secretKey+${user.id}',
         'displayName': user.properties['nickname'],
         'photoUrl': user.properties['profile_image'],
       };
+
+      print('----> kakaotalk login success: $data');
 
       /// login or register.
       loginOrRegister(data);
