@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:englishfun_v2/widgets/commons/common.image.dart';
 import '../../flutterbase.controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -40,26 +41,34 @@ class ChatMessage extends StatelessWidget {
           children: <Widget>[
             Row(
               children: <Widget>[
-                Material(
-                  child: CachedNetworkImage(
-                    placeholder: (context, url) => Container(
-                      child: CircularProgressIndicator(
-                        strokeWidth: 1.0,
-                      ),
-                      width: 35.0,
-                      height: 35.0,
-                      padding: EdgeInsets.all(10.0),
-                    ),
-                    imageUrl: data['photoUrl'],
-                    width: 35.0,
-                    height: 35.0,
-                    fit: BoxFit.cover,
+                ClipOval(
+                  child: CommonImage(
+                    data['photoUrl'],
+                    width: 36,
+                    height: 36,
                   ),
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(18.0),
-                  ),
-                  clipBehavior: Clip.hardEdge,
                 ),
+                // if (data['photoUrl'] != null)
+                // Material(
+                //   child: CachedNetworkImage(
+                //     placeholder: (context, url) => Container(
+                //       child: CircularProgressIndicator(
+                //         strokeWidth: 1.0,
+                //       ),
+                //       width: 35.0,
+                //       height: 35.0,
+                //       padding: EdgeInsets.all(10.0),
+                //     ),
+                //     imageUrl: data['photoUrl'],
+                //     width: 35.0,
+                //     height: 35.0,
+                //     fit: BoxFit.cover,
+                //   ),
+                //   borderRadius: BorderRadius.all(
+                //     Radius.circular(18.0),
+                //   ),
+                //   clipBehavior: Clip.hardEdge,
+                // ),
                 Container(
                   child: Column(
                     children: [
