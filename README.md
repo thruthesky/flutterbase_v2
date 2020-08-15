@@ -32,6 +32,8 @@
 
 * When there is platform error, `FlutterbaseAuthService::onPlatformException()` will be called and the error will be thrown to parent. You can catch the error like below.
 
+  * The right way to handle error on social login to wrap with `try & catch` block.
+
 ``` dart
 onTap: () async {
   try {

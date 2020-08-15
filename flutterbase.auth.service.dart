@@ -1,4 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:apple_sign_in/apple_sign_in.dart';
+
 import '../flutter_library/library.dart';
 import '../flutterbase_v2/flutterbase.controller.dart';
 import '../flutterbase_v2/flutterbase.defines.dart';
@@ -15,17 +16,71 @@ import 'package:kakao_flutter_sdk/auth.dart';
 class FlutterbaseAuthService {
   final FlutterbaseController _controller = Get.find();
 
-  /// Google Account Login
+  /// Firebase Auth
   ///
 
   ///
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  //////////////////////////////////////////////////////////////////////////////
+  ///
+  ///
+  /// Apple Sign in
+  ///
+  ///
+  //////////////////////////////////////////////////////////////////////////////
+
+  /// Determine if Apple SignIn is available.
+  /// Android may not provide Apple Sign In.
+  Future<bool> get appleSignInAvailable => AppleSignIn.isAvailable();
+
+  /// Sign in with Apple
+  Future<FirebaseUser> loginWithAppleAccount() async {
+    try {
+      final AuthorizationResult appleResult =
+          await AppleSignIn.performRequests([
+        AppleIdRequest(requestedScopes: [Scope.email, Scope.fullName])
+      ]);
+
+      if (appleResult.error != null) {
+        print('Got apple login error:');
+        print(appleResult.error);
+        throw appleResult.error.code;
+      }
+
+      final AuthCredential credential =
+          OAuthProvider(providerId: 'apple.com').getCredential(
+        accessToken:
+            String.fromCharCodes(appleResult.credential.authorizationCode),
+        idToken: String.fromCharCodes(appleResult.credential.identityToken),
+      );
+
+      AuthResult firebaseResult = await _auth.signInWithCredential(credential);
+      FirebaseUser user = firebaseResult.user;
+
+      // Optional, Update user data in Firestore
+      // updateUserData(user);
+      return user;
+    } catch (error) {
+      print(error);
+      return null;
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  ///
+  ///
+  /// Google Sign in
+  ///
+  ///
+
+  //////////////////////////////////////////////////////////////////////////////
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   /// Login with Google account.
   ///
   /// @note If the user cancels, then `null` is returned
-  Future<void> loginWithGoogleAccount() async {
+  Future<FirebaseUser> loginWithGoogleAccount() async {
     try {
       final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
@@ -53,6 +108,8 @@ class FlutterbaseAuthService {
       /// Logout immediately from `Google` so, the user can choose another
       /// Google account on next login.
       await _googleSignIn.signOut();
+
+      return user;
     } on PlatformException catch (e) {
       await onPlatformException(e);
       // print('ecode: ${e.code}');
@@ -70,7 +127,7 @@ class FlutterbaseAuthService {
   /// ```dart
   /// ```
   ///
-  Future<void> loginWithFacebookAccount(
+  Future<FirebaseUser> loginWithFacebookAccount(
       {@required BuildContext context}) async {
     String result = await Navigator.push(
       context,
@@ -89,6 +146,7 @@ class FlutterbaseAuthService {
       final AuthResult authResult =
           await _auth.signInWithCredential(facebookAuthCred);
       print(authResult.user);
+      return authResult.user;
     } on PlatformException catch (e) {
       await onPlatformException(e);
     } catch (e) {
@@ -102,7 +160,7 @@ class FlutterbaseAuthService {
   /// 카카오톡 로그인
   ///
   ///
-  loginWithKakaotalkAccount() async {
+  Future<FirebaseUser> loginWithKakaotalkAccount() async {
     KakaoContext.clientId = _controller.kakaotalkClientId;
     KakaoContext.javascriptClientId = _controller.kakaotalkJavascriptClientId;
 
@@ -146,8 +204,9 @@ class FlutterbaseAuthService {
       print('----> kakaotalk login success: $data');
 
       /// login or register.
-      loginOrRegister(data);
+      return loginOrRegister(data);
       // _controller.update(['user']);
+
     } on KakaoAuthException catch (e) {
       throw e;
     } on KakaoClientException catch (e) {
@@ -199,7 +258,7 @@ class FlutterbaseAuthService {
   /// 회원 가입을 한다.
   ///
   /// `users` collection 에 비밀번호는 저장하지 않는다.
-  Future<void> register(Map<String, dynamic> data) async {
+  Future<FirebaseUser> register(Map<String, dynamic> data) async {
     if (data == null) throw INVALID_PARAMETER;
     if (isEmpty(data['email'])) throw EMAIL_IS_EMPTY;
     if (isEmpty(data['password'])) throw PASSWORD_IS_EMPTY;
@@ -219,7 +278,7 @@ class FlutterbaseAuthService {
     data.remove('password');
     data['uid'] = re.user.uid;
 
-    await profileUpdate(data);
+    return await profileUpdate(data);
 
     // data['uid'] = re.user.uid;
     // await _userDoc(user.uid).setData(data);
@@ -231,7 +290,7 @@ class FlutterbaseAuthService {
   ///
   /// @warning The user must log in before calling the method.
   ///
-  Future<void> profileUpdate(Map<String, dynamic> data) async {
+  Future<FirebaseUser> profileUpdate(Map<String, dynamic> data) async {
     /// 이메일 변경 불가
     if (data['email'] != null) throw EMAIL_CANNOT_BY_CHANGED;
 
@@ -263,8 +322,12 @@ class FlutterbaseAuthService {
 
     /// 사용자 도큐먼트 정보 갱신
     // userDocument = await profile();
+
+    return _controller.user;
   }
 
+  /// Display `ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL` in snackbar.
+  /// Other errors will be thrown to parent.
   onPlatformException(e) async {
     print('onPlatformException():');
     print(e.code);
@@ -287,7 +350,7 @@ class FlutterbaseAuthService {
   /// - 먼저, 로그인을 한다.
   /// - 만약, 로그인이 안되면, 회원 가입을 한다.
   /// - 회원 정보를 업데이트한다.
-  Future<void> loginOrRegister(Map<String, String> data) async {
+  Future<FirebaseUser> loginOrRegister(Map<String, String> data) async {
     print('data: $data');
 
     try {
@@ -297,12 +360,12 @@ class FlutterbaseAuthService {
       data.remove('password');
 
       // print('Going to update profile');
-      await profileUpdate(data);
+      return await profileUpdate(data);
     } on PlatformException catch (e) {
       if (e.code == ERROR_USER_NOT_FOUND) {
         /// Not regisgtered? then register
         print('Not registered. Going to register');
-        await register(data);
+        return await register(data);
       } else {
         await onPlatformException(e);
       }
