@@ -150,8 +150,10 @@ class FlutterbaseAuthService {
     } on PlatformException catch (e) {
       await onPlatformException(e);
     } catch (e) {
-      await onCatch(e);
+      throw e;
+      // await onCatch(e);
     }
+    return null;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -340,9 +342,9 @@ class FlutterbaseAuthService {
     throw e;
   }
 
-  onCatch(e) async {
-    throw e;
-  }
+  // onCatch(e) async {
+  //   throw e;
+  // }
 
   /// 회원 로그인을 먼저 시도하고, 가입이 되어져 있지 않으면 가입을 한다.
   ///
@@ -370,7 +372,8 @@ class FlutterbaseAuthService {
         await onPlatformException(e);
       }
     } catch (e) {
-      await onCatch(e);
+      throw (e);
+      // await onCatch(e);
     }
   }
 }

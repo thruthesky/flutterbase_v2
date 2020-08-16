@@ -96,7 +96,7 @@ class _ChatWidgetState extends State<ChatWidget> {
     return SafeArea(
       child: Column(
         children: <Widget>[
-          Flexible(
+          Expanded(
             child: ListView.builder(
               padding: EdgeInsets.all(10.0),
               itemBuilder: (context, index) => ChatMessage(messages[index]),
@@ -145,8 +145,8 @@ class _ChatWidgetState extends State<ChatWidget> {
     if (!englishOnly(content.trim())) {
       Get.dialog(
         PlatformAlertDialog(
-          title: Text('English Chat'),
-          content: Text('This is English chat room. Please type English only.'),
+          title: Text(Tx.chatAlertTitle),
+          content: Text(Tx.chatAlertEnglishOnly),
           actions: [
             PlatformButton(
               child: Text(Tx.ok),
@@ -162,7 +162,10 @@ class _ChatWidgetState extends State<ChatWidget> {
       textEditingController.clear();
       var data = {
         'uid': firebaseController.user.uid,
-        'displayName': firebaseController.user.displayName,
+
+        /// displayName can be null. Especially when user set privacy on Apple sign in.
+        'displayName': firebaseController.user.displayName ??
+            firebaseController.user.email.split('@').first,
         'photoUrl': firebaseController.user.photoUrl,
         'timestamp': FieldValue.serverTimestamp(),
         'content': content,

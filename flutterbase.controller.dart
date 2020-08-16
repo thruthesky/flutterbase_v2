@@ -56,8 +56,9 @@ class FlutterbaseController extends GetxController {
           // print('EngineModel::onAuthStateChanged() user logged out');
           _auth.signInAnonymously();
         } else {
-          // print('EngineModel::onAuthStateChanged() user logged in: $u');
-          // print('Anonymous: ${u.isAnonymous}, ${u.email}');
+          print('EngineModel::onAuthStateChanged() user logged in: $u');
+          print(
+              'Anonymous: ${u.isAnonymous}, uid: ${u.uid}, email: ${u.email}, displayName: ${u.displayName}');
 
           /// 실제 사용자로 로그인을 한 경우, Anonymous 는 제외
           if (loggedIn) {
