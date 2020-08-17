@@ -1,3 +1,6 @@
+/// This is the topic that all users will subscribe when they install the app.
+const String ALL_TOPIC = 'allTopic';
+
 const String FAILED_ON_FACEBOOK_LOGIN = 'flutterbase/failed-on-facebook-login';
 const String ERROR_USER_NOT_FOUND = 'ERROR_USER_NOT_FOUND';
 

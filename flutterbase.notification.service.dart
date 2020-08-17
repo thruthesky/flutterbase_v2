@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:englishfun_v2/flutterbase_v2/flutterbase.defines.dart';
 import './flutterbase.controller.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
@@ -15,24 +16,48 @@ class FlutterbaseNotificationService {
 
   DocumentReference userInstance;
 
-  Future init() async {
-    // User instance from firebase.
-    // userInstance =
-    //     Firestore.instance.collection('users').document(_controller.user.uid);
-
+  Future<void> init() async {
     print("Flutterbase Notification Init()");
 
+    await _initRequestPermission();
+
+    /// subscribe to all topic
+    await _fcm.subscribeToTopic(ALL_TOPIC);
+
+    _initConfigureCallbackHandlers();
+
+    _initUpdateUserToken();
+  }
+
+  /// Updates user token when app starts.
+  _initUpdateUserToken() {
+    firebaseMessaging.getToken().then((token) {
+      print('token: $token');
+      // userInstance.updateData({'pushToken': token});
+    }).catchError((err) {
+      print(err.message.toString());
+    });
+  }
+
+  Future<void> _initRequestPermission() async {
+    /// Ask permission to iOS user for Push Notification.
     if (Platform.isIOS) {
       _fcm.onIosSettingsRegistered.listen((event) {
         // fb.setUserToken();
+        // You can update the user's token here.
       });
-      _fcm.requestNotificationPermissions(IosNotificationSettings());
+      await _fcm.requestNotificationPermissions(IosNotificationSettings());
     } else {
-      firebaseMessaging.requestNotificationPermissions();
+      /// For Android, no permission request is required. just get Push token.
+      await firebaseMessaging.requestNotificationPermissions();
     }
-    // await _fcm.subscribeToTopic(Settings.fcmTopic);
-    await _fcm.subscribeToTopic('allTopic');
+  }
 
+  _initConfigureCallbackHandlers() {
+    /// Configure callback handlers for
+    /// - foreground
+    /// - background
+    /// - exited
     _fcm.configure(
       onMessage: (Map<String, dynamic> message) async {
         print('onMessage: $message');
@@ -47,13 +72,6 @@ class FlutterbaseNotificationService {
         _displayAndNavigate(message, false);
       },
     );
-
-    firebaseMessaging.getToken().then((token) {
-      print('token: $token');
-      // userInstance.updateData({'pushToken': token});
-    }).catchError((err) {
-      print(err.message.toString());
-    });
   }
 
   /// Display notification & navigate
