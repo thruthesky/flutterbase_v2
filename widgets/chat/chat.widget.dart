@@ -95,6 +95,7 @@ class _ChatWidgetState extends State<ChatWidget> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Column(
+        key: ValueKey('chatWidgetColumn'),
         children: <Widget>[
           Expanded(
             child: ListView.builder(
