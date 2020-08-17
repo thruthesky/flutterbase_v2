@@ -98,24 +98,17 @@ class _ChatWidgetState extends State<ChatWidget> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Stack(
-        children: [
-          Column(
-            children: <Widget>[
-              Expanded(
-                child: ListView.builder(
-                  padding: EdgeInsets.all(10.0),
-                  itemBuilder: (context, index) => ChatMessage(messages[index]),
-                  itemCount: messages.length,
-                  reverse: true,
-                  controller: listScrollController,
-                ),
-              ),
-              ChatInputBox(
-                controller: textEditingController,
-                onPressed: onSendMessage,
-              )
-            ],
+      child: Column(
+        key: ValueKey('chatWidgetColumn'),
+        children: <Widget>[
+          Expanded(
+            child: ListView.builder(
+              padding: EdgeInsets.all(10.0),
+              itemBuilder: (context, index) => ChatMessage(messages[index]),
+              itemCount: messages.length,
+              reverse: true,
+              controller: listScrollController,
+            ),
           ),
           Positioned(
             top: 10,

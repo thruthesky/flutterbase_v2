@@ -12,7 +12,12 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk/all.dart' as kakao;
 import 'package:kakao_flutter_sdk/auth.dart';
 
-/// This class handles `Firebase User Login`
+/// Firebase Auth Service
+///
+/// This class handles `Firebase User Login`.
+///
+///
+///
 class FlutterbaseAuthService {
   final FlutterbaseController _controller = Get.find();
 
@@ -119,7 +124,9 @@ class FlutterbaseAuthService {
       // print('loginWithGoogleAccount::');
       // print(e);
       // throw e.message;
+      throw e;
     }
+    return null;
   }
 
   /// Login with Facebook Account
