@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:englishfun_v2/flutterbase_v2/widgets/chat/chat.input_box.dart';
 import 'package:englishfun_v2/services/routes.dart';
 import 'package:englishfun_v2/services/texts.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -32,10 +33,6 @@ class _ChatWidgetState extends State<ChatWidget> {
 
   ///
   Map<String, dynamic> args = Get.arguments;
-
-  final FirebaseMessaging _fcm = FirebaseMessaging();
-
-  bool subscribeTopic = false;
 
   var messages = [];
 
@@ -109,6 +106,10 @@ class _ChatWidgetState extends State<ChatWidget> {
               controller: listScrollController,
             ),
           ),
+          ChatInputBox(
+            controller: textEditingController,
+            onPressed: onSendMessage,
+          )
           // Positioned(
           //   top: 10,
           //   right: -10,

@@ -32,7 +32,11 @@ class FlutterbaseNotificationService {
   }
 
   Future subscribeTopic(String topicName) async {
-    await _fcm.subscribeToTopic(ALL_TOPIC);
+    await _fcm.subscribeToTopic(topicName);
+  }
+
+  Future unsubscribeTopic(String topicName) async {
+    await _fcm.unsubscribeFromTopic(topicName);
   }
 
   /// Updates user token when app starts.
