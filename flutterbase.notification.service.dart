@@ -24,11 +24,15 @@ class FlutterbaseNotificationService {
     await _initRequestPermission();
 
     /// subscribe to all topic
-    await _fcm.subscribeToTopic(ALL_TOPIC);
+    await subscribeTopic(ALL_TOPIC);
 
     _initConfigureCallbackHandlers();
 
     _initUpdateUserToken();
+  }
+
+  Future subscribeTopic(String topicName) async {
+    await _fcm.subscribeToTopic(ALL_TOPIC);
   }
 
   /// Updates user token when app starts.
