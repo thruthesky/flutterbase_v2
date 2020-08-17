@@ -16,6 +16,8 @@ class FlutterbaseNotificationService {
 
   DocumentReference userInstance;
 
+  /// @attention the app must call this method on app boot.
+  /// This method is not called automatically.
   Future<void> init() async {
     print("Flutterbase Notification Init()");
 
@@ -98,15 +100,18 @@ class FlutterbaseNotificationService {
       // print('==> Display snackbar: notification: $notification')
 
       Get.snackbar(
-        message['title'].toString(),
-        message['body'].toString(),
+        notification['title'].toString(),
+        notification['body'].toString(),
         onTap: (ret) {
+          /// Do something based on the `data`
           // if (ret['postId'] != null) {
           //   Get.toNamed(Settings.postViewRoute, arguments: {'postId': ret['postId']});
           // }
         },
       );
     } else {
+      /// App will come here when the user open the app by tapping a push notification on the system tray.
+      /// Do something based on the `data`.
       if (data['postId'] != null) {
         // Get.toNamed(Settings.postViewRoute, arguments: {'postId': data['postId']});
       }

@@ -6,7 +6,6 @@ import 'package:englishfun_v2/services/texts.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import '../../flutterbase.controller.dart';
-import 'chat.input_box.dart';
 import 'chat.message.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -110,37 +109,37 @@ class _ChatWidgetState extends State<ChatWidget> {
               controller: listScrollController,
             ),
           ),
-          Positioned(
-            top: 10,
-            right: -10,
-            child: FlatButton(
-              child: Material(
-                child: Icon(
-                  subscribeTopic
-                      ? Icons.notifications
-                      : Icons.notifications_off,
-                  size: 32,
-                ),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(18.0),
-                ),
-                clipBehavior: Clip.hardEdge,
-              ),
-              onPressed: () {
-                print('subscribe topic');
-                if (!subscribeTopic) {
-                  print('subscribe');
-                  _fcm.subscribeToTopic('ChatSubscribe');
-                  subscribeTopic = true;
-                } else {
-                  print('unsubscribe');
-                  _fcm.unsubscribeFromTopic('ChatSubscribe');
-                  subscribeTopic = false;
-                }
-                setState(() {});
-              },
-            ),
-          )
+          // Positioned(
+          //   top: 10,
+          //   right: -10,
+          //   child: FlatButton(
+          //     child: Material(
+          //       child: Icon(
+          //         subscribeTopic
+          //             ? Icons.notifications
+          //             : Icons.notifications_off,
+          //         size: 32,
+          //       ),
+          //       borderRadius: BorderRadius.all(
+          //         Radius.circular(18.0),
+          //       ),
+          //       clipBehavior: Clip.hardEdge,
+          //     ),
+          //     onPressed: () {
+          //       print('subscribe topic');
+          //       if (!subscribeTopic) {
+          //         print('subscribe');
+          //         _fcm.subscribeToTopic('ChatSubscribe');
+          //         subscribeTopic = true;
+          //       } else {
+          //         print('unsubscribe');
+          //         _fcm.unsubscribeFromTopic('ChatSubscribe');
+          //         subscribeTopic = false;
+          //       }
+          //       setState(() {});
+          //     },
+          //   ),
+          // )
         ],
       ),
     );
