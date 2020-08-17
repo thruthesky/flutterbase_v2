@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:englishfun_v2/app.service.dart';
 import 'package:englishfun_v2/services/routes.dart';
 import 'package:englishfun_v2/services/texts.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import '../../flutterbase.controller.dart';
 import 'chat.input_box.dart';
@@ -33,6 +33,10 @@ class _ChatWidgetState extends State<ChatWidget> {
 
   ///
   Map<String, dynamic> args = Get.arguments;
+
+  final FirebaseMessaging _fcm = FirebaseMessaging();
+
+  bool subscribeTopic = false;
 
   var messages = [];
 
@@ -94,20 +98,55 @@ class _ChatWidgetState extends State<ChatWidget> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Column(
-        children: <Widget>[
-          Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.all(10.0),
-              itemBuilder: (context, index) => ChatMessage(messages[index]),
-              itemCount: messages.length,
-              reverse: true,
-              controller: listScrollController,
-            ),
+      child: Stack(
+        children: [
+          Column(
+            children: <Widget>[
+              Expanded(
+                child: ListView.builder(
+                  padding: EdgeInsets.all(10.0),
+                  itemBuilder: (context, index) => ChatMessage(messages[index]),
+                  itemCount: messages.length,
+                  reverse: true,
+                  controller: listScrollController,
+                ),
+              ),
+              ChatInputBox(
+                controller: textEditingController,
+                onPressed: onSendMessage,
+              )
+            ],
           ),
-          ChatInputBox(
-            controller: textEditingController,
-            onPressed: onSendMessage,
+          Positioned(
+            top: 10,
+            right: -10,
+            child: FlatButton(
+              child: Material(
+                child: Icon(
+                  subscribeTopic
+                      ? Icons.notifications
+                      : Icons.notifications_off,
+                  size: 32,
+                ),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(18.0),
+                ),
+                clipBehavior: Clip.hardEdge,
+              ),
+              onPressed: () {
+                print('subscribe topic');
+                if (!subscribeTopic) {
+                  print('subscribe');
+                  _fcm.subscribeToTopic('ChatSubscribe');
+                  subscribeTopic = true;
+                } else {
+                  print('unsubscribe');
+                  _fcm.unsubscribeFromTopic('ChatSubscribe');
+                  subscribeTopic = false;
+                }
+                setState(() {});
+              },
+            ),
           )
         ],
       ),
@@ -115,8 +154,7 @@ class _ChatWidgetState extends State<ChatWidget> {
   }
 
   bool englishOnly(String content) {
-    //// RegExp("[ A-Za-z0-9`~!@#\$%^&*()\\-=+{}\\[\\];:\'\"|\\\\,<.>/?]");
-    ///
+    // print('englishOnly');
     String allowed =
         "‘’“” `1234567890-=~!@#\$%^&*()_+qwertyuiop[]\\QWERTYUIOP{}|asdfghjkl;\ASDFGHJKL:\"zxcvbnm,./ZXCVBNM<>?";
 
@@ -125,7 +163,7 @@ class _ChatWidgetState extends State<ChatWidget> {
       if (allowed.indexOf(char) > -1) {
         /// fine
       } else {
-        print('char: $char');
+        // print('char: $char');
         return false;
       }
     }
@@ -137,9 +175,6 @@ class _ChatWidgetState extends State<ChatWidget> {
       return alertLogin();
     }
 
-    /// TODO: English only chat.
-    /// allow ascii code only. from a-zA-Z0-9, !@#$%^&&**{|}|}><?><?>/.,/.,
-    ///
     String content = textEditingController.text;
 
     if (!englishOnly(content.trim())) {

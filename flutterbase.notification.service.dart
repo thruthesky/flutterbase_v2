@@ -13,8 +13,15 @@ class FlutterbaseNotificationService {
 
   final FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
 
+  DocumentReference userInstance;
+
   Future init() async {
+    // User instance from firebase.
+    // userInstance =
+    //     Firestore.instance.collection('users').document(_controller.user.uid);
+
     print("Flutterbase Notification Init()");
+
     if (Platform.isIOS) {
       _fcm.onIosSettingsRegistered.listen((event) {
         // fb.setUserToken();
@@ -43,10 +50,7 @@ class FlutterbaseNotificationService {
 
     firebaseMessaging.getToken().then((token) {
       print('token: $token');
-      Firestore.instance
-          .collection('users')
-          .document(_controller.user.uid)
-          .updateData({'pushToken': token});
+      // userInstance.updateData({'pushToken': token});
     }).catchError((err) {
       print(err.message.toString());
     });
