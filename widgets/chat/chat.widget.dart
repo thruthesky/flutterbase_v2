@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:englishfun_v2/controllers/app.controller.dart';
 import 'package:englishfun_v2/flutterbase_v2/flutterbase.notification.service.dart';
 import 'package:englishfun_v2/flutterbase_v2/widgets/chat/chat.input_box.dart';
 import 'package:englishfun_v2/services/routes.dart';
@@ -20,6 +21,7 @@ class ChatWidget extends StatefulWidget {
 class _ChatWidgetState extends State<ChatWidget> {
   ///
   final FlutterbaseController firebaseController = Get.find();
+  final AppController appController = Get.find();
 
   FlutterbaseNotificationService fns = FlutterbaseNotificationService();
 
@@ -37,6 +39,8 @@ class _ChatWidgetState extends State<ChatWidget> {
   Map<String, dynamic> args = Get.arguments;
 
   var messages = [];
+
+  StreamSubscription<QuerySnapshot> chatRoomSubscription;
 
   @override
   void initState() {
@@ -73,7 +77,11 @@ class _ChatWidgetState extends State<ChatWidget> {
     }
 
     /// listen for a new message.
-    chatRoom.orderBy('timestamp', descending: true).limit(1).snapshots().listen(
+    chatRoomSubscription = chatRoom
+        .orderBy('timestamp', descending: true)
+        .limit(1)
+        .snapshots()
+        .listen(
           (data) => data.documents.forEach(
             (doc) {
               var data = doc.data;
@@ -85,12 +93,17 @@ class _ChatWidgetState extends State<ChatWidget> {
               ///   - and when user types a new message.
               if (data['id'] != messages[0]['id']) {
                 messages.insert(0, data);
+                setState(() {});
               }
-              // messages.add(doc.data);
-              setState(() {});
             },
           ),
         );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    chatRoomSubscription.cancel();
   }
 
   @override
@@ -174,7 +187,8 @@ class _ChatWidgetState extends State<ChatWidget> {
       listScrollController.animateTo(0.0,
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);
 
-      fns.sendNotification('Chat Room', content);
+      fns.sendNotification('from ${firebaseController.user.displayName}',
+          content, Routes.chatting);
     } else {
       Get.snackbar('Nothing to send', '');
     }
