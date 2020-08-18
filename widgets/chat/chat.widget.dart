@@ -1,16 +1,15 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:englishfun_v2/flutterbase_v2/flutterbase.notification.service.dart';
 import 'package:englishfun_v2/flutterbase_v2/widgets/chat/chat.input_box.dart';
-import 'package:englishfun_v2/services/routes.dart';
-import 'package:englishfun_v2/services/texts.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:englishfun_v2/services/routes.dart';
 import '../../flutterbase.controller.dart';
-import 'chat.message.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'chat.message.dart';
 
 class ChatWidget extends StatefulWidget {
   @override
@@ -144,11 +143,13 @@ class _ChatWidgetState extends State<ChatWidget> {
     if (!englishOnly(content.trim())) {
       Get.dialog(
         PlatformAlertDialog(
-          title: Text(Tx.chatAlertTitle),
-          content: Text(Tx.chatAlertEnglishOnly),
+          title: Text('chatAlertTitle'.tr),
+          content: Text('chatAlertEnglishOnly'.tr),
           actions: [
             PlatformButton(
-              child: Text(Tx.ok),
+              /// @TODO: uncomment line #153 then remove line #154.
+              // child: Text('ok'.tr),
+              child: Text('Ok'), 
               onPressed: () => Get.back(),
             )
           ],
