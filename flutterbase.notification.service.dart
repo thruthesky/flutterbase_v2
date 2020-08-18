@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
+import 'package:englishfun_v2/defines.dart';
 import 'package:englishfun_v2/flutterbase_v2/flutterbase.defines.dart';
 import './flutterbase.controller.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -103,6 +106,7 @@ class FlutterbaseNotificationService {
     // iOS 에서는 data 속성없이, 객체에 바로 저장된다.
     var data = message['data'] ?? message;
 
+    // return if the senderID is the owner.
     if (data != null && data['senderID'] == _controller.user.uid) {
       return;
     }
@@ -132,5 +136,55 @@ class FlutterbaseNotificationService {
 
   showNotification(message) {
     Get.snackbar(message['title'].toString(), message['body'].toString());
+  }
+
+  Future<void> sendNotification(subject, title) async {
+    print('SendNotification');
+    final postUrl = 'https://fcm.googleapis.com/fcm/send';
+
+    String toParams = "/topics/" + chatroomTopic;
+
+    final data = jsonEncode({
+      "notification": {"body": subject, "title": title},
+      "priority": "high",
+      "data": {
+        "click_action": "FLUTTER_NOTIFICATION_CLICK",
+        "id": "1",
+        "status": "done",
+        "sound": 'default',
+        "senderID": _controller.user.uid,
+      },
+      "to": "$toParams"
+    });
+
+    final headers = {
+      HttpHeaders.contentTypeHeader: "application/json",
+      HttpHeaders.authorizationHeader:
+          "key=AAAA043HfBE:APA91bH1a54jNrzpOiT3UPEkFUSCRr7V_CAnaHy39syAWQ4JqVzbPH3nfu12odfmSFTWAUG4VObV-LoQrSjfHnQU-3yPpaImMKFq59G15QMf8WIB0t_83C1w2wdzF98VbZmIX4Gw7IiN"
+    };
+
+    var dio = Dio();
+
+    print('try sending notification');
+    try {
+      var response = await dio.post(
+        postUrl,
+        data: data,
+        options: Options(
+          headers: headers,
+        ),
+      );
+      if (response.statusCode == 200) {
+        // on success do
+        print("notification success");
+      } else {
+        // on failure do
+        print("notification failure");
+      }
+      print(response.data);
+    } catch (e) {
+      print('Dio error in sendNotification');
+      print(e);
+    }
   }
 }

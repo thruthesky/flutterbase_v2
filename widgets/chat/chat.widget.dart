@@ -1,14 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dio/dio.dart';
-import 'package:englishfun_v2/defines.dart';
+import 'package:englishfun_v2/flutterbase_v2/flutterbase.notification.service.dart';
 import 'package:englishfun_v2/flutterbase_v2/widgets/chat/chat.input_box.dart';
 import 'package:englishfun_v2/services/routes.dart';
 import 'package:englishfun_v2/services/texts.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import '../../flutterbase.controller.dart';
 import 'chat.message.dart';
@@ -24,6 +20,8 @@ class ChatWidget extends StatefulWidget {
 class _ChatWidgetState extends State<ChatWidget> {
   ///
   final FlutterbaseController firebaseController = Get.find();
+
+  FlutterbaseNotificationService fns = FlutterbaseNotificationService();
 
   ///
   CollectionReference chatRoom = Firestore.instance.collection('chatRoom');
@@ -122,7 +120,7 @@ class _ChatWidgetState extends State<ChatWidget> {
   bool englishOnly(String content) {
     // print('englishOnly');
     String allowed =
-        "‘’“” `1234567890-=~!@#\$%^&*()_+qwertyuiop[]\\QWERTYUIOP{}|asdfghjkl;\ASDFGHJKL:\"zxcvbnm,./ZXCVBNM<>?";
+        "‘’“” `1234567890-=~!@#\$%^&*()_+qwertyuiop[]\\QWERTYUIOP{}|asdfghjkl;\ASDFGHJKL:\"'zxcvbnm,./ZXCVBNM<>?";
 
     List<String> chars = content.split('');
     for (String char in chars) {
@@ -176,7 +174,7 @@ class _ChatWidgetState extends State<ChatWidget> {
       listScrollController.animateTo(0.0,
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);
 
-      sendNotification('Chat Room', content);
+      fns.sendNotification('Chat Room', content);
     } else {
       Get.snackbar('Nothing to send', '');
     }
@@ -205,60 +203,5 @@ class _ChatWidgetState extends State<ChatWidget> {
       ],
     ));
     return;
-  }
-
-  Future<void> sendNotification(subject, title) async {
-    print('SendNotification');
-    final postUrl = 'https://fcm.googleapis.com/fcm/send';
-
-    String toParams = "/topics/" + chatroomTopic;
-
-    final data = jsonEncode({
-      "notification": {"body": subject, "title": title},
-      "priority": "high",
-      "data": {
-        "click_action": "FLUTTER_NOTIFICATION_CLICK",
-        "id": "1",
-        "status": "done",
-        "sound": 'default',
-        "senderID": firebaseController.user.uid,
-      },
-      "to": "$toParams"
-    });
-
-    final headers = {
-      HttpHeaders.contentTypeHeader: "application/json",
-      HttpHeaders.authorizationHeader:
-          "key=AAAA043HfBE:APA91bH1a54jNrzpOiT3UPEkFUSCRr7V_CAnaHy39syAWQ4JqVzbPH3nfu12odfmSFTWAUG4VObV-LoQrSjfHnQU-3yPpaImMKFq59G15QMf8WIB0t_83C1w2wdzF98VbZmIX4Gw7IiN"
-    };
-
-    var dio = Dio();
-
-    print('try sending notification');
-    try {
-      var response = await dio.post(
-        postUrl,
-        data: data,
-        options: Options(
-          headers: headers,
-        ),
-      );
-      if (response.statusCode == 200) {
-        // on success do
-        print("notification success");
-      } else {
-        // on failure do
-        print("notification failure");
-      }
-      return response.data;
-    } catch (e) {
-      print('Dio error in sendNotification');
-      print(e);
-    }
-
-    // final response = await http.post(postUrl,
-    //     body: json.encode(data),
-    //     encoding: Encoding.getByName('utf-8'),
-    //     headers: headers);
   }
 }
