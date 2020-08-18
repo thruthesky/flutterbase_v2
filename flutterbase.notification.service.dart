@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:englishfun_v2/defines.dart';
 import 'package:englishfun_v2/flutterbase_v2/flutterbase.defines.dart';
+import 'package:englishfun_v2/services/routes.dart';
+import 'package:flutter/material.dart';
 import './flutterbase.controller.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
@@ -111,6 +113,9 @@ class FlutterbaseNotificationService {
       return;
     }
 
+    // print('Get.route: ${Get.currentRoute}');
+    if (Get.currentRoute == Routes.chatting) return;
+
     // print('==> Got push data: $data');
     if (display) {
       // print('==> Display snackbar: notification: $notification')
@@ -118,12 +123,19 @@ class FlutterbaseNotificationService {
       Get.snackbar(
         notification['title'].toString(),
         notification['body'].toString(),
-        // onTap: (ret) {
-        //   /// Do something based on the `data`
-        //   // if (ret['postId'] != null) {
-        //   //   Get.toNamed(Settings.postViewRoute, arguments: {'postId': ret['postId']});
-        //   // }
+        // onTap: () {
+        //   print('data data: ');
+        //   print(data);
+        //   Get.toNamed(data['route']);
         // },
+        mainButton: FlatButton(
+          child: Text('Open'),
+          onPressed: () {
+            print('data data: ');
+            print(data);
+            Get.toNamed(data['route']);
+          },
+        ),
       );
     } else {
       /// App will come here when the user open the app by tapping a push notification on the system tray.
@@ -138,14 +150,14 @@ class FlutterbaseNotificationService {
     Get.snackbar(message['title'].toString(), message['body'].toString());
   }
 
-  Future<void> sendNotification(subject, title) async {
+  Future<void> sendNotification(title, body, route) async {
     print('SendNotification');
     final postUrl = 'https://fcm.googleapis.com/fcm/send';
 
     String toParams = "/topics/" + chatroomTopic;
 
     final data = jsonEncode({
-      "notification": {"body": subject, "title": title},
+      "notification": {"body": body, "title": title},
       "priority": "high",
       "data": {
         "click_action": "FLUTTER_NOTIFICATION_CLICK",
@@ -153,6 +165,7 @@ class FlutterbaseNotificationService {
         "status": "done",
         "sound": 'default',
         "senderID": _controller.user.uid,
+        'route': route,
       },
       "to": "$toParams"
     });
