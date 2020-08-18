@@ -103,6 +103,10 @@ class FlutterbaseNotificationService {
     // iOS 에서는 data 속성없이, 객체에 바로 저장된다.
     var data = message['data'] ?? message;
 
+    if (data != null && data['senderID'] == _controller.user.uid) {
+      return;
+    }
+
     // print('==> Got push data: $data');
     if (display) {
       // print('==> Display snackbar: notification: $notification')
@@ -110,12 +114,12 @@ class FlutterbaseNotificationService {
       Get.snackbar(
         notification['title'].toString(),
         notification['body'].toString(),
-        onTap: (ret) {
-          /// Do something based on the `data`
-          // if (ret['postId'] != null) {
-          //   Get.toNamed(Settings.postViewRoute, arguments: {'postId': ret['postId']});
-          // }
-        },
+        // onTap: (ret) {
+        //   /// Do something based on the `data`
+        //   // if (ret['postId'] != null) {
+        //   //   Get.toNamed(Settings.postViewRoute, arguments: {'postId': ret['postId']});
+        //   // }
+        // },
       );
     } else {
       /// App will come here when the user open the app by tapping a push notification on the system tray.

@@ -1,6 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
+import 'package:englishfun_v2/defines.dart';
 import 'package:englishfun_v2/flutterbase_v2/widgets/chat/chat.input_box.dart';
 import 'package:englishfun_v2/services/routes.dart';
 import 'package:englishfun_v2/services/texts.dart';
@@ -110,37 +114,6 @@ class _ChatWidgetState extends State<ChatWidget> {
             controller: textEditingController,
             onPressed: onSendMessage,
           )
-          // Positioned(
-          //   top: 10,
-          //   right: -10,
-          //   child: FlatButton(
-          //     child: Material(
-          //       child: Icon(
-          //         subscribeTopic
-          //             ? Icons.notifications
-          //             : Icons.notifications_off,
-          //         size: 32,
-          //       ),
-          //       borderRadius: BorderRadius.all(
-          //         Radius.circular(18.0),
-          //       ),
-          //       clipBehavior: Clip.hardEdge,
-          //     ),
-          //     onPressed: () {
-          //       print('subscribe topic');
-          //       if (!subscribeTopic) {
-          //         print('subscribe');
-          //         _fcm.subscribeToTopic('ChatSubscribe');
-          //         subscribeTopic = true;
-          //       } else {
-          //         print('unsubscribe');
-          //         _fcm.unsubscribeFromTopic('ChatSubscribe');
-          //         subscribeTopic = false;
-          //       }
-          //       setState(() {});
-          //     },
-          //   ),
-          // )
         ],
       ),
     );
@@ -202,6 +175,8 @@ class _ChatWidgetState extends State<ChatWidget> {
       chatRoom.add(data);
       listScrollController.animateTo(0.0,
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+
+      sendNotification('Chat Room', content);
     } else {
       Get.snackbar('Nothing to send', '');
     }
@@ -230,5 +205,60 @@ class _ChatWidgetState extends State<ChatWidget> {
       ],
     ));
     return;
+  }
+
+  Future<void> sendNotification(subject, title) async {
+    print('SendNotification');
+    final postUrl = 'https://fcm.googleapis.com/fcm/send';
+
+    String toParams = "/topics/" + chatroomTopic;
+
+    final data = jsonEncode({
+      "notification": {"body": subject, "title": title},
+      "priority": "high",
+      "data": {
+        "click_action": "FLUTTER_NOTIFICATION_CLICK",
+        "id": "1",
+        "status": "done",
+        "sound": 'default',
+        "senderID": firebaseController.user.uid,
+      },
+      "to": "$toParams"
+    });
+
+    final headers = {
+      HttpHeaders.contentTypeHeader: "application/json",
+      HttpHeaders.authorizationHeader:
+          "key=AAAA043HfBE:APA91bH1a54jNrzpOiT3UPEkFUSCRr7V_CAnaHy39syAWQ4JqVzbPH3nfu12odfmSFTWAUG4VObV-LoQrSjfHnQU-3yPpaImMKFq59G15QMf8WIB0t_83C1w2wdzF98VbZmIX4Gw7IiN"
+    };
+
+    var dio = Dio();
+
+    print('try sending notification');
+    try {
+      var response = await dio.post(
+        postUrl,
+        data: data,
+        options: Options(
+          headers: headers,
+        ),
+      );
+      if (response.statusCode == 200) {
+        // on success do
+        print("notification success");
+      } else {
+        // on failure do
+        print("notification failure");
+      }
+      return response.data;
+    } catch (e) {
+      print('Dio error in sendNotification');
+      print(e);
+    }
+
+    // final response = await http.post(postUrl,
+    //     body: json.encode(data),
+    //     encoding: Encoding.getByName('utf-8'),
+    //     headers: headers);
   }
 }
