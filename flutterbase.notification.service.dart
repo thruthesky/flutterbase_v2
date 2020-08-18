@@ -45,7 +45,7 @@ class FlutterbaseNotificationService {
   /// Updates user token when app starts.
   _initUpdateUserToken() {
     firebaseMessaging.getToken().then((token) {
-      print('token: $token');
+      // print('token: $token');
       // userInstance.updateData({'pushToken': token});
     }).catchError((err) {
       print(err.message.toString());
