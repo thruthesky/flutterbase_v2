@@ -162,7 +162,7 @@ class _ChatWidgetState extends State<ChatWidget> {
             PlatformButton(
               /// @TODO: uncomment line #153 then remove line #154.
               child: Text('ok'.tr),
-              // child: Text('Ok'), 
+              // child: Text('Ok'),
               onPressed: () => Get.back(),
             )
           ],
