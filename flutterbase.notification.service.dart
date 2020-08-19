@@ -152,15 +152,14 @@ class FlutterbaseNotificationService {
         "id": "1",
         "status": "done",
         "sound": 'default',
-        "senderID": _controller.user.uid,
+        "senderID": _controller.user.uid, // to identify who owner
       },
       "to": "$toParams"
     });
 
     final headers = {
       HttpHeaders.contentTypeHeader: "application/json",
-      HttpHeaders.authorizationHeader:
-          "key=AAAA043HfBE:APA91bH1a54jNrzpOiT3UPEkFUSCRr7V_CAnaHy39syAWQ4JqVzbPH3nfu12odfmSFTWAUG4VObV-LoQrSjfHnQU-3yPpaImMKFq59G15QMf8WIB0t_83C1w2wdzF98VbZmIX4Gw7IiN"
+      HttpHeaders.authorizationHeader: "key=" + firebaseServerToken
     };
 
     var dio = Dio();
