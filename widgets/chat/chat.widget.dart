@@ -1,16 +1,16 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:englishfun_v2/controllers/app.controller.dart';
 import 'package:englishfun_v2/flutterbase_v2/flutterbase.notification.service.dart';
 import 'package:englishfun_v2/flutterbase_v2/widgets/chat/chat.input_box.dart';
-import 'package:englishfun_v2/services/routes.dart';
-import 'package:englishfun_v2/services/texts.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:englishfun_v2/services/routes.dart';
 import '../../flutterbase.controller.dart';
-import 'chat.message.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'chat.message.dart';
 
 class ChatWidget extends StatefulWidget {
   @override
@@ -20,6 +20,7 @@ class ChatWidget extends StatefulWidget {
 class _ChatWidgetState extends State<ChatWidget> {
   ///
   final FlutterbaseController firebaseController = Get.find();
+  final AppController appController = Get.find();
 
   FlutterbaseNotificationService fns = FlutterbaseNotificationService();
 
@@ -37,6 +38,8 @@ class _ChatWidgetState extends State<ChatWidget> {
   Map<String, dynamic> args = Get.arguments;
 
   var messages = [];
+
+  StreamSubscription<QuerySnapshot> chatRoomSubscription;
 
   @override
   void initState() {
@@ -73,7 +76,11 @@ class _ChatWidgetState extends State<ChatWidget> {
     }
 
     /// listen for a new message.
-    chatRoom.orderBy('timestamp', descending: true).limit(1).snapshots().listen(
+    chatRoomSubscription = chatRoom
+        .orderBy('timestamp', descending: true)
+        .limit(1)
+        .snapshots()
+        .listen(
           (data) => data.documents.forEach(
             (doc) {
               var data = doc.data;
@@ -85,12 +92,17 @@ class _ChatWidgetState extends State<ChatWidget> {
               ///   - and when user types a new message.
               if (data['id'] != messages[0]['id']) {
                 messages.insert(0, data);
+                setState(() {});
               }
-              // messages.add(doc.data);
-              setState(() {});
             },
           ),
         );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    chatRoomSubscription.cancel();
   }
 
   @override
@@ -144,11 +156,13 @@ class _ChatWidgetState extends State<ChatWidget> {
     if (!englishOnly(content.trim())) {
       Get.dialog(
         PlatformAlertDialog(
-          title: Text(Tx.chatAlertTitle),
-          content: Text(Tx.chatAlertEnglishOnly),
+          title: Text('chatAlertTitle'.tr),
+          content: Text('chatAlertEnglishOnly'.tr),
           actions: [
             PlatformButton(
-              child: Text(Tx.ok),
+              /// @TODO: uncomment line #153 then remove line #154.
+              child: Text('ok'.tr),
+              // child: Text('Ok'), 
               onPressed: () => Get.back(),
             )
           ],
@@ -174,7 +188,8 @@ class _ChatWidgetState extends State<ChatWidget> {
       listScrollController.animateTo(0.0,
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);
 
-      fns.sendNotification('Chat Room', content);
+      fns.sendNotification('from ${firebaseController.user.displayName}',
+          content, Routes.chatting);
     } else {
       Get.snackbar('Nothing to send', '');
     }
