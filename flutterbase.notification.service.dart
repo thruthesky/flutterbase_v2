@@ -151,7 +151,7 @@ class FlutterbaseNotificationService {
   }
 
   Future<void> sendNotification(title, body, route) async {
-    print('SendNotification');
+    // print('SendNotification');
     final postUrl = 'https://fcm.googleapis.com/fcm/send';
 
     String toParams = "/topics/" + chatroomTopic;
@@ -177,7 +177,7 @@ class FlutterbaseNotificationService {
 
     var dio = Dio();
 
-    print('try sending notification');
+    // print('try sending notification');
     try {
       var response = await dio.post(
         postUrl,
