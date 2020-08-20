@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:englishfun_v2/controllers/app.controller.dart';
 import 'package:englishfun_v2/flutterbase_v2/flutterbase.notification.service.dart';
 import 'package:englishfun_v2/flutterbase_v2/widgets/chat/chat.input_box.dart';
+import 'package:englishfun_v2/services/keys.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:englishfun_v2/services/routes.dart';
 import '../../flutterbase.controller.dart';
@@ -109,12 +110,15 @@ class _ChatWidgetState extends State<ChatWidget> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Column(
-        key: ValueKey('chatWidgetColumn'),
+        key: ValueKey(Keys.chatWidgetColumn),
         children: <Widget>[
           Expanded(
             child: ListView.builder(
               padding: EdgeInsets.all(10.0),
-              itemBuilder: (context, index) => ChatMessage(messages[index]),
+              itemBuilder: (context, index) => ChatMessage(
+                messages[index],
+                key: ValueKey('chatMessage'),
+              ),
               itemCount: messages.length,
               reverse: true,
               controller: listScrollController,
