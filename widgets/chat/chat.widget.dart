@@ -117,7 +117,7 @@ class _ChatWidgetState extends State<ChatWidget> {
               padding: EdgeInsets.all(10.0),
               itemBuilder: (context, index) => ChatMessage(
                 messages[index],
-                key: ValueKey('chatMessage'),
+                key: ValueKey('chatMessage$index'),
               ),
               itemCount: messages.length,
               reverse: true,
