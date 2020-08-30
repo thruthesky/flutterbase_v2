@@ -34,9 +34,7 @@ class _ChatInputBoxState extends State<ChatInputBox> {
           IconButton(
               padding: EdgeInsets.all(12.0),
               icon: Icon(Icons.send),
-              onPressed: widget
-                  .onPressed // () => onSendMessage(textEditingController.text, 0),
-              ),
+              onPressed: widget.onPressed),
         ],
       ),
       width: double.infinity,
