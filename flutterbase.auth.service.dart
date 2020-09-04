@@ -50,7 +50,7 @@ class FlutterbaseAuthService {
       if (appleResult.error != null) {
         print('Got apple login error:');
         print(appleResult.error);
-        throw appleResult.error.code;
+        throw appleResult.error;
       }
 
       final AuthCredential credential =
@@ -67,8 +67,8 @@ class FlutterbaseAuthService {
       // updateUserData(user);
       return user;
     } catch (error) {
-      print(error);
-      return null;
+      // print(error);
+      throw (error);
     }
   }
 
