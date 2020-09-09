@@ -28,7 +28,7 @@ class _LoginFormState extends State<LoginForm> {
                         decoration: BoxDecoration(
                           image: DecorationImage(
                             image: Image.network(
-                              _.user.photoUrl,
+                              _.user.photoURL,
                               width: 64,
                               height: 64,
                             ).image,
