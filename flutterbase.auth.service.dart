@@ -139,11 +139,12 @@ class FlutterbaseAuthService {
     String result = await Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => CustomWebViewForFacebookLogin(
-                selectedUrl:
-                    'https://www.facebook.com/dialog/oauth?client_id=${_controller.facebookAppId}&redirect_uri=${_controller.facebookRedirectUrl}&response_type=token&scope=email,public_profile,',
-              ),
-          maintainState: true),
+        builder: (context) => CustomWebViewForFacebookLogin(
+          selectedUrl:
+              'https://www.facebook.com/dialog/oauth?client_id=${_controller.facebookAppId}&redirect_uri=${_controller.facebookRedirectUrl}&response_type=token&scope=email,public_profile,',
+        ),
+        maintainState: true,
+      ),
     );
 
     if (result == null) throw FAILED_ON_FACEBOOK_LOGIN;
