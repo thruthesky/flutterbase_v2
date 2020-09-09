@@ -1,9 +1,9 @@
-import 'package:englishfun_v2/defines.dart';
-import 'package:englishfun_v2/flutterbase_v2/widgets/chat/chat.message.content.dart';
-import 'package:englishfun_v2/flutterbase_v2/widgets/chat/chat.message.date_time.dart';
-import 'package:englishfun_v2/flutterbase_v2/widgets/chat/chat.message.name.dart';
-import 'package:englishfun_v2/flutterbase_v2/widgets/chat/chat.message.user_icon.dart';
 import 'package:flutter/material.dart';
+import '../../../defines.dart';
+import './chat.message.content.dart';
+import './chat.message.date_time.dart';
+import './chat.message.name.dart';
+import './chat.message.user_icon.dart';
 
 class ChatMessageOthers extends StatelessWidget {
   ChatMessageOthers(this.data);

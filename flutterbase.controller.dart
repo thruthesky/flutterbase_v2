@@ -13,7 +13,7 @@ class FlutterbaseController extends GetxController {
   /// - `user` must be changed by `onAuthStateChanged` only.
   ///   To handle user login.obs
   ///   When user logs out or didn't logged in, the user will login as `Anonymouse` by `onAuthStateChagned`
-  FirebaseUser user;
+  User user;
   // FirebaseUser get user => _user;
 
   FlutterbaseController({
@@ -48,8 +48,8 @@ class FlutterbaseController extends GetxController {
   }
 
   _initAuthChange() async {
-    _auth.onAuthStateChanged.listen(
-      (FirebaseUser u) async {
+    _auth.authStateChanges().listen(
+      (User u) async {
         print(u);
         user = u;
         if (u == null) {

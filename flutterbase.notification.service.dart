@@ -3,13 +3,15 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
-import 'package:englishfun_v2/defines.dart';
-import 'package:englishfun_v2/flutterbase_v2/flutterbase.defines.dart';
-import 'package:englishfun_v2/services/routes.dart';
 import 'package:flutter/material.dart';
-import './flutterbase.controller.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
+
+
+import './flutterbase.defines.dart';
+import './flutterbase.controller.dart';
+import '../services/routes.dart';
+import '../defines.dart';
 
 /// This class handles `Firebase Notification`
 class FlutterbaseNotificationService {

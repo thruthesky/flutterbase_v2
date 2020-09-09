@@ -1,7 +1,8 @@
-import 'package:englishfun_v2/flutterbase_v2/widgets/chat/chat.message.others.dart';
-import '../../flutterbase.controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import './chat.message.others.dart';
+import '../../flutterbase.controller.dart';
 
 class ChatMessage extends StatelessWidget {
   ChatMessage(

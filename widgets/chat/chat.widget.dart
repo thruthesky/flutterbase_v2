@@ -1,12 +1,11 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:englishfun_v2/controllers/app.controller.dart';
-import 'package:englishfun_v2/flutterbase_v2/flutterbase.notification.service.dart';
-import 'package:englishfun_v2/flutterbase_v2/widgets/chat/chat.input_box.dart';
-import 'package:englishfun_v2/services/keys.dart';
+import '../../../flutterbase_v2/flutterbase.notification.service.dart';
+import '../../../flutterbase_v2/widgets/chat/chat.input_box.dart';
+import '../../../services/keys.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:englishfun_v2/services/routes.dart';
+import '../../../services/routes.dart';
 import '../../flutterbase.controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,12 +20,11 @@ class ChatWidget extends StatefulWidget {
 class _ChatWidgetState extends State<ChatWidget> {
   ///
   final FlutterbaseController firebaseController = Get.find();
-  final AppController appController = Get.find();
 
   FlutterbaseNotificationService fns = FlutterbaseNotificationService();
 
   ///
-  CollectionReference chatRoom = Firestore.instance.collection('chatRoom');
+  CollectionReference chatRoom = FirebaseFirestore.instance.collection('chatRoom');
 
   ///
   final TextEditingController textEditingController =
@@ -59,17 +57,17 @@ class _ChatWidgetState extends State<ChatWidget> {
     QuerySnapshot chats = await chatRoom
         .orderBy('timestamp', descending: true)
         .limit(30)
-        .getDocuments();
+        .get();
 
     ///
-    final docs = chats.documents;
+    final docs = chats.docs;
 
     /// Save last 30 into variable.
     if (docs.length > 0) {
       docs.forEach(
         (doc) {
-          var data = doc.data;
-          data['id'] = doc.documentID;
+          var data = doc.data();
+          data['id'] = doc.id;
           messages.add(data);
         },
       );
@@ -82,10 +80,10 @@ class _ChatWidgetState extends State<ChatWidget> {
         .limit(1)
         .snapshots()
         .listen(
-          (data) => data.documents.forEach(
+          (data) => data.docs.forEach(
             (doc) {
-              var data = doc.data;
-              data['id'] = doc.documentID;
+              var data = doc.data();
+              data['id'] = doc.id;
 
               /// Don't add the last message twice.
               /// This is for

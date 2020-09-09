@@ -1,4 +1,4 @@
-import 'package:englishfun_v2/defines.dart';
+import '../../../defines.dart';
 import 'package:flutter/material.dart';
 
 class ChatMessageContent extends StatelessWidget {

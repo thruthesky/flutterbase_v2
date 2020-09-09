@@ -40,7 +40,7 @@ class FlutterbaseAuthService {
   Future<bool> get appleSignInAvailable => AppleSignIn.isAvailable();
 
   /// Sign in with Apple
-  Future<FirebaseUser> loginWithAppleAccount() async {
+  Future<User> loginWithAppleAccount() async {
     try {
       final AuthorizationResult appleResult =
           await AppleSignIn.performRequests([
@@ -53,15 +53,15 @@ class FlutterbaseAuthService {
         throw appleResult.error;
       }
 
-      final AuthCredential credential =
-          OAuthProvider(providerId: 'apple.com').getCredential(
+      final AuthCredential credential = OAuthProvider('apple.com').credential(
         accessToken:
             String.fromCharCodes(appleResult.credential.authorizationCode),
         idToken: String.fromCharCodes(appleResult.credential.identityToken),
       );
 
-      AuthResult firebaseResult = await _auth.signInWithCredential(credential);
-      FirebaseUser user = firebaseResult.user;
+      UserCredential firebaseResult =
+          await _auth.signInWithCredential(credential);
+      User user = firebaseResult.user;
 
       // Optional, Update user data in Firestore
       // updateUserData(user);
@@ -85,7 +85,7 @@ class FlutterbaseAuthService {
   /// Login with Google account.
   ///
   /// @note If the user cancels, then `null` is returned
-  Future<FirebaseUser> loginWithGoogleAccount() async {
+  Future<User> loginWithGoogleAccount() async {
     try {
       final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
@@ -99,9 +99,9 @@ class FlutterbaseAuthService {
         idToken: googleAuth.idToken,
       );
 
-      AuthResult authResult = await _auth.signInWithCredential(credential);
+      UserCredential authResult = await _auth.signInWithCredential(credential);
 
-      final FirebaseUser user = authResult.user;
+      final User user = authResult.user;
 
       print("signed in " + user.displayName);
       print(user);
@@ -134,7 +134,7 @@ class FlutterbaseAuthService {
   /// ```dart
   /// ```
   ///
-  Future<FirebaseUser> loginWithFacebookAccount(
+  Future<User> loginWithFacebookAccount(
       {@required BuildContext context}) async {
     String result = await Navigator.push(
       context,
@@ -148,9 +148,8 @@ class FlutterbaseAuthService {
 
     if (result == null) throw FAILED_ON_FACEBOOK_LOGIN;
     try {
-      final facebookAuthCred =
-          FacebookAuthProvider.getCredential(accessToken: result);
-      final AuthResult authResult =
+      final facebookAuthCred = FacebookAuthProvider.credential(result);
+      final UserCredential authResult =
           await _auth.signInWithCredential(facebookAuthCred);
       print(authResult.user);
       return authResult.user;
@@ -169,7 +168,7 @@ class FlutterbaseAuthService {
   /// 카카오톡 로그인
   ///
   ///
-  Future<FirebaseUser> loginWithKakaotalkAccount() async {
+  Future<User> loginWithKakaotalkAccount() async {
     KakaoContext.clientId = _controller.kakaotalkClientId;
     KakaoContext.javascriptClientId = _controller.kakaotalkJavascriptClientId;
 
@@ -252,10 +251,10 @@ class FlutterbaseAuthService {
   /// - `user` 변수는 이 함수에서 직접 업데이트 하지 않고 `onAuthStateChanged()`에서 자동 감지를 해서 업데이트 한다.
   ///
   ///
-  Future<FirebaseUser> login(String email, String password) async {
+  Future<User> login(String email, String password) async {
     if (email == null || email == '') throw INPUT_EMAIL;
     if (password == null || password == '') throw INPUT_PASSWORD;
-    AuthResult result = await _auth.signInWithEmailAndPassword(
+    UserCredential result = await _auth.signInWithEmailAndPassword(
       email: email.trim(),
       password: password,
     );
@@ -267,13 +266,13 @@ class FlutterbaseAuthService {
   /// 회원 가입을 한다.
   ///
   /// `users` collection 에 비밀번호는 저장하지 않는다.
-  Future<FirebaseUser> register(Map<String, dynamic> data) async {
+  Future<User> register(Map<String, dynamic> data) async {
     if (data == null) throw INVALID_PARAMETER;
     if (isEmpty(data['email'])) throw EMAIL_IS_EMPTY;
     if (isEmpty(data['password'])) throw PASSWORD_IS_EMPTY;
     if (isEmpty(data['displayName'])) throw DISPLAYNAME_IS_EMPTY;
 
-    AuthResult re = await _auth.createUserWithEmailAndPassword(
+    UserCredential re = await _auth.createUserWithEmailAndPassword(
       email: data['email'],
       password: data['password'],
     );
@@ -299,7 +298,7 @@ class FlutterbaseAuthService {
   ///
   /// @warning The user must log in before calling the method.
   ///
-  Future<FirebaseUser> profileUpdate(Map<String, dynamic> data) async {
+  Future<User> profileUpdate(Map<String, dynamic> data) async {
     /// 이메일 변경 불가
     if (data['email'] != null) throw EMAIL_CANNOT_BY_CHANGED;
 
@@ -308,20 +307,15 @@ class FlutterbaseAuthService {
 
     /// 닉네임, 사진은 `Firebase Auth` 에 업데이트
     if (data['displayName'] != null || data['photoUrl'] != null) {
-      final up = UserUpdateInfo();
-      if (data['displayName'] != null) {
-        up.displayName = data['displayName'];
-      }
-      if (data['photoUrl'] != null) {
-        up.photoUrl = data['photoUrl'];
-      }
-
-      await _controller.user.updateProfile(up);
+      await _controller.user.updateProfile(
+        displayName: data['displayName'] ?? '',
+        photoURL: data['photoUrl'] ?? '',
+      );
 
       /// Reload updated user information.
       /// Firebase Auth 정보 갱신
       await _controller.user.reload();
-      _controller.user = await _auth.currentUser();
+      _controller.user = _auth.currentUser;
 
       print('profileUpdate success');
     }

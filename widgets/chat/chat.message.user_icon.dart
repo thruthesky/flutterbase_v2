@@ -1,4 +1,4 @@
-import 'package:englishfun_v2/widgets/commons/common.image.dart';
+import '../../../widgets/commons/common.image.dart';
 import 'package:flutter/material.dart';
 
 class ChatMessageUserIcon extends StatelessWidget {
