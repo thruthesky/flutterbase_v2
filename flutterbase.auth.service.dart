@@ -354,7 +354,7 @@ class FlutterbaseAuthService {
   /// - 먼저, 로그인을 한다.
   /// - 만약, 로그인이 안되면, 회원 가입을 한다.
   /// - 회원 정보를 업데이트한다.
-  Future<FirebaseUser> loginOrRegister(Map<String, String> data) async {
+  Future<User> loginOrRegister(Map<String, String> data) async {
     print('data: $data');
 
     try {
