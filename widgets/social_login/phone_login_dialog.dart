@@ -105,7 +105,11 @@ class _PhoneLoginFormState extends State<PhoneLoginForm> {
 
   signInWithOTP(String verificationID, String code) {
     AuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: verificationID, smsCode: code);
+      verificationId: verificationID,
+      smsCode: code,
+    );
+
+    // print('SignIn');
     signIn(credential);
   }
 
@@ -115,6 +119,7 @@ class _PhoneLoginFormState extends State<PhoneLoginForm> {
 
       /// called after the verification process is complete
       verificationCompleted: (PhoneAuthCredential credential) async {
+        // print('autoSignIn');
         signIn(credential);
       },
 
