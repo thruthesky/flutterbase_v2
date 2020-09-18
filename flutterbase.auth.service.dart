@@ -230,6 +230,42 @@ class FlutterbaseAuthService {
     }
   }
 
+  //////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Login with custom token
+  Future<UserCredential> loginWithToken(String customToken) async {
+    try {
+      final UserCredential authResult =
+          await _auth.signInWithCustomToken(customToken);
+
+      print('loginWithToken::authResult ===>>>');
+      print(authResult);
+
+      return authResult;
+    } catch (e) {
+      print('error: =====> ');
+      print(e);
+      throw e;
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  ///
+  /// Link other credential to existing firebase account
+  Future<UserCredential> linkCredential(AuthCredential credential) async {
+    print(credential);
+    try {
+      final UserCredential authResult =
+          await _auth.currentUser.linkWithCredential(credential);
+      print('linkCredential::authResult ===>>>');
+      return authResult;
+    } catch (e) {
+      print('error: =====> ');
+      print(e);
+      throw e;
+    }
+  }
+
   /// 사용자 로그아웃을 하고 `notifyListeners()` 를 한다. `user` 는 Listeners 에서 자동 업데이트된다.
   logout() async {
     _controller.logout();
