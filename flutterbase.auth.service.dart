@@ -167,6 +167,9 @@ class FlutterbaseAuthService {
   ///
   /// Kakaotalk Login
   /// 카카오톡 로그인
+  /// 
+  /// Once user logs in with Kakaotalk,
+  ///   the app logins or registered into Firebase 
   ///
   ///
   Future<User> loginWithKakaotalkAccount() async {
@@ -212,8 +215,8 @@ class FlutterbaseAuthService {
 
       print('----> kakaotalk login success: $data');
 
-      /// login or register.
-      return loginOrRegister(data);
+      /// login or register into Firebase.
+      return loginOrRegisterIntoFirebase(data);
       // _controller.update(['user']);
 
     } on KakaoAuthException catch (e) {
@@ -390,7 +393,7 @@ class FlutterbaseAuthService {
   /// - 먼저, 로그인을 한다.
   /// - 만약, 로그인이 안되면, 회원 가입을 한다.
   /// - 회원 정보를 업데이트한다.
-  Future<User> loginOrRegister(Map<String, String> data) async {
+  Future<User> loginOrRegisterIntoFirebase(Map<String, String> data) async {
     print('data: $data');
 
     try {
