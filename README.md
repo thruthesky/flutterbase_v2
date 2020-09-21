@@ -1,20 +1,15 @@
 # flutterbase_v2
 
-
 ## Installation
 
 * Follow the [Flutter + Firebase Installation](https://docs.google.com/document/d/e/2PACX-1vQuzuqmI0mgKt82ZI6silmBLrsJuroAZa2XR7OsqoMGPAKb-DVtXUsjjH7TjSd_9pD_0e04qq9gaTKx/pub)
 * Enable `Anonymous` in `Firebase Authentication Sign-in Method`.
-
 
 ## Coding guide
 
 * Most of the codes are derived from [Flutterbase Version 1](https://github.com/thruthesky/flutterbase). You can refer to it for details.
 
 * See the code in [fchat](https://github.com/thruthesky/fchat) app.
-
-
-## Installation
 
 ### Login
 
@@ -28,7 +23,6 @@
   * You need to create and set an App in Kakaotalk developers account.
   * And set for `kakao_flutter_sdk` and its dependencies.
   * And you need to enable `Email/Password` under Firebase > Authentication > Sign-in method.
-
 
 * When there is platform error, `FlutterbaseAuthService::onPlatformException()` will be called and the error will be thrown to parent. You can catch the error like below.
 
@@ -47,8 +41,10 @@ onTap: () async {
 
 ### Chat
 
-
 ## Bugs & Known Problems
 
 * Once a user logged with facebook account, he cannot switch to another facebook account.
 
+### Dependencies
+
+* country_code_picker

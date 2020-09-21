@@ -2,12 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterpress/flutterbase_v2/flutterbase.auth.service.dart';
 import 'package:get/get.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 
 class PhoneAuthForm extends StatefulWidget {
-  final String phoneNo;
   final Function onVerified;
 
-  PhoneAuthForm({@required this.phoneNo, this.onVerified()});
+  PhoneAuthForm({this.onVerified(String phoneNo)});
 
   @override
   _PhoneAuthFormState createState() => _PhoneAuthFormState();
@@ -19,13 +19,15 @@ class _PhoneAuthFormState extends State<PhoneAuthForm> {
 
   final _formKey = GlobalKey<FormState>();
   final _codeController = TextEditingController();
+  final _phoneController = TextEditingController();
 
   bool isCodeSent = false;
   String verificationID;
 
+  String code = '+82';
+
   @override
   void initState() {
-    verifyPhoneNumber(widget.phoneNo);
     super.initState();
   }
 
@@ -38,25 +40,38 @@ class _PhoneAuthFormState extends State<PhoneAuthForm> {
           key: _formKey,
           child: Column(
             children: [
-              Padding(
-                padding: EdgeInsets.all(20),
-                child: Text(
-                  '${widget.phoneNo}',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
+              Row(
+                children: [
+                  CountryCodePicker(
+                    onChanged: (_) {
+                      code = _.dialCode;
+                      print(code);
+                    },
+                    initialSelection: code,
+                    showCountryOnly: false,
+                    showOnlyCountryWhenClosed: false,
+                    alignLeft: false,
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: TextFormField(
+                      keyboardType: TextInputType.phone,
+                      textInputAction: TextInputAction.done,
+                      readOnly: isCodeSent,
+                      controller: _phoneController,
+                      decoration:
+                          InputDecoration(labelText: 'Input phone number'),
+                    ),
+                  ),
+                ],
               ),
-              // TextFormField(
-              //   readOnly: isCodeSent,
-              //   controller: _phoneController,
-              //   decoration: InputDecoration(
-              //     labelText: 'Input phone number',
-              //   ),
-              // ),
-              SizedBox(height: isCodeSent ? 10 : 0),
+              SizedBox(height: isCodeSent ? 20 : 10),
               if (isCodeSent)
                 TextFormField(
+                  keyboardType: TextInputType.phone,
+                  textInputAction: TextInputAction.done,
                   controller: _codeController,
-                  decoration: InputDecoration(labelText: 'Input Code (OTP)'),
+                  decoration: InputDecoration(labelText: 'Verification Code'),
                 ),
               SizedBox(height: 10),
               Row(
@@ -78,7 +93,8 @@ class _PhoneAuthFormState extends State<PhoneAuthForm> {
                     ),
                     onPressed: isCodeSent
                         ? () => verifyCode(verificationID, _codeController.text)
-                        : null,
+                        : () =>
+                            verifyPhoneNumber('$code${_phoneController.text}'),
                   )
                 ],
               )
@@ -102,7 +118,7 @@ class _PhoneAuthFormState extends State<PhoneAuthForm> {
       UserCredential authResult = await _auth.linkCredential(credential);
       print('verify::authResult ===>');
       print(authResult);
-      widget.onVerified();
+      widget.onVerified(authResult.user.phoneNumber);
     } catch (e) {
       print('verify Error');
       print(e);
@@ -110,6 +126,9 @@ class _PhoneAuthFormState extends State<PhoneAuthForm> {
   }
 
   verifyPhoneNumber(String phoneNumber) {
+    print('phoneNumber');
+    print(phoneNumber);
+
     _fbAuth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
 
