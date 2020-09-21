@@ -3,7 +3,7 @@ const String ALL_TOPIC = 'allTopic';
 
 const String FAILED_ON_FACEBOOK_LOGIN = 'flutterbase/failed-on-facebook-login';
 const String ERROR_USER_NOT_FOUND = 'ERROR_USER_NOT_FOUND';
-
+const String FIREBASE_ERROR_USER_NOT_FOUND = 'user-not-found';
 const String INPUT_EMAIL = 'input_email';
 const String INPUT_PASSWORD = 'input_password';
 

@@ -1,3 +1,5 @@
+import 'package:flutterpress/services/app.service.dart';
+
 import '../../flutterbase.auth.service.dart';
 import '../../flutterbase.controller.dart';
 import 'package:flutter/material.dart';
@@ -69,9 +71,11 @@ class _LoginFormState extends State<LoginForm> {
               RaisedButton(
                 onPressed: () async {
                   try {
-                    auth.loginWithKakaotalkAccount();
+                    await auth.loginWithKakaotalkAccount();
+                    /// wordpress login.
                   } catch (e) {
                     print('e: $e');
+                    AppService.alertError(e);
                   }
                   setState(() {});
                 },

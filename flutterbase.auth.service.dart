@@ -1,11 +1,11 @@
 import 'package:apple_sign_in/apple_sign_in.dart';
+import 'package:flutterpress/services/app.service.dart';
 
 import '../flutter_library/library.dart';
 import '../flutterbase_v2/flutterbase.controller.dart';
 import '../flutterbase_v2/flutterbase.defines.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -41,7 +41,6 @@ class FlutterbaseAuthService {
 
   /// Sign in with Apple
   Future<User> loginWithAppleAccount() async {
-    try {
       final AuthorizationResult appleResult =
           await AppleSignIn.performRequests([
         AppleIdRequest(requestedScopes: [Scope.email, Scope.fullName])
@@ -66,10 +65,6 @@ class FlutterbaseAuthService {
       // Optional, Update user data in Firestore
       // updateUserData(user);
       return user;
-    } catch (error) {
-      // print(error);
-      throw (error);
-    }
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -86,7 +81,6 @@ class FlutterbaseAuthService {
   ///
   /// @note If the user cancels, then `null` is returned
   Future<User> loginWithGoogleAccount() async {
-    try {
       final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
         return null;
@@ -115,18 +109,6 @@ class FlutterbaseAuthService {
       await _googleSignIn.signOut();
 
       return user;
-    } on PlatformException catch (e) {
-      await onPlatformException(e);
-      // print('ecode: ${e.code}');
-      // final code = e.code.toLowerCase();
-      // throw code;
-    } catch (e) {
-      // print('loginWithGoogleAccount::');
-      // print(e);
-      // throw e.message;
-      throw e;
-    }
-    return null;
   }
 
   /// Login with Facebook Account
@@ -148,28 +130,20 @@ class FlutterbaseAuthService {
     );
 
     if (result == null) throw FAILED_ON_FACEBOOK_LOGIN;
-    try {
       final facebookAuthCred = FacebookAuthProvider.credential(result);
       final UserCredential authResult =
           await _auth.signInWithCredential(facebookAuthCred);
       print(authResult.user);
       return authResult.user;
-    } on PlatformException catch (e) {
-      await onPlatformException(e);
-    } catch (e) {
-      throw e;
-      // await onCatch(e);
-    }
-    return null;
   }
 
   //////////////////////////////////////////////////////////////////////////////
   ///
   /// Kakaotalk Login
   /// 카카오톡 로그인
-  /// 
+  ///
   /// Once user logs in with Kakaotalk,
-  ///   the app logins or registered into Firebase 
+  ///   the app logins or registered into Firebase
   ///
   ///
   Future<User> loginWithKakaotalkAccount() async {
@@ -179,7 +153,6 @@ class FlutterbaseAuthService {
     /// 카카오톡 로그인을 경우, 상황에 따라 메일 주소가 없을 수 있다. 메일 주소가 필수 항목이 아닌 경우,
     /// 따라서, id 로 메일 주소를 만들어서, 자동 회원 가입을 한다.
     ///
-    try {
       /// 카카오톡 앱이 핸드폰에 설치되었는가?
       /// See if kakaotalk is installed on the phone.
       final installed = await isKakaoTalkInstalled();
@@ -207,7 +180,7 @@ class FlutterbaseAuthService {
       kakao.User user = await kakao.UserApi.instance.me();
       print(user.properties);
       Map<String, String> data = {
-        'email': 'kakaotalk${user.id}@kakao.com',
+        'email': AppService.getKakaoEmail(user),
         'password': 'Settings.secretKey+${user.id}',
         'displayName': user.properties['nickname'],
         'photoUrl': user.properties['profile_image'],
@@ -218,26 +191,12 @@ class FlutterbaseAuthService {
       /// login or register into Firebase.
       return loginOrRegisterIntoFirebase(data);
       // _controller.update(['user']);
-
-    } on KakaoAuthException catch (e) {
-      throw e;
-    } on KakaoClientException catch (e) {
-      throw e;
-    } catch (e) {
-      /// 카카오톡 로그인에서 에러가 발생하는 경우,
-      /// 에러 메시지가 로그인 창에 표시가 되므로, 상단 위젯에서는 에러를 무시를 해도 된다.
-      /// 예를 들어, 비밀번호 오류나, 로그인 취소 등.
-      print('error: =====> ');
-      print(e);
-      throw e;
-    }
   }
 
   //////////////////////////////////////////////////////////////////////////////
   ///
   /// Login with custom token
   Future<UserCredential> loginWithToken(String customToken) async {
-    try {
       final UserCredential authResult =
           await _auth.signInWithCustomToken(customToken);
 
@@ -245,11 +204,6 @@ class FlutterbaseAuthService {
       print(authResult);
 
       return authResult;
-    } catch (e) {
-      print('error: =====> ');
-      print(e);
-      throw e;
-    }
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -257,16 +211,10 @@ class FlutterbaseAuthService {
   /// Link other credential to existing firebase account
   Future<UserCredential> linkCredential(AuthCredential credential) async {
     print(credential);
-    try {
       final UserCredential authResult =
           await _auth.currentUser.linkWithCredential(credential);
       print('linkCredential::authResult ===>>>');
       return authResult;
-    } catch (e) {
-      print('error: =====> ');
-      print(e);
-      throw e;
-    }
   }
 
   /// 사용자 로그아웃을 하고 `notifyListeners()` 를 한다. `user` 는 Listeners 에서 자동 업데이트된다.
@@ -371,17 +319,18 @@ class FlutterbaseAuthService {
 
   /// Display `ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL` in snackbar.
   /// Other errors will be thrown to parent.
-  onPlatformException(e) async {
-    print('onPlatformException():');
-    print(e.code);
-    if (e.code == ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL) {
-      Get.snackbar('중복 소셜 로그인',
-          '동일한 메일 주소의 다른 소셜 아이디로 이미 로그인되어져 있습니다. 다른 소셜아이디로 로그인을 하세요.',
-          duration: Duration(seconds: 10));
-    }
-    print(e);
-    throw e;
-  }
+  // onPlatformException(e) async {
+  //   print('onPlatformException():');
+  //   print(e.code);
+  //   if (e.code == ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL) {
+  //     Get.snackbar('중복 소셜 로그인',
+  //         '동일한 메일 주소의 다른 소셜 아이디로 이미 로그인되어져 있습니다. 다른 소셜아이디로 로그인을 하세요.',
+  //         duration: Duration(seconds: 10));
+  //   }
+  //   print(e);
+  //   throw e;
+  // }
+
 
   // onCatch(e) async {
   //   throw e;
@@ -399,22 +348,21 @@ class FlutterbaseAuthService {
     try {
       await login(data['email'], data['password']);
       print('loggedIn!');
+
+
       data.remove('email');
       data.remove('password');
+    // print('Going to update profile after login: data: ${data}');
+    return await profileUpdate(data);
 
-      // print('Going to update profile');
-      return await profileUpdate(data);
-    } on PlatformException catch (e) {
-      if (e.code == ERROR_USER_NOT_FOUND) {
+    } catch (e) {
+      if (e.code == FIREBASE_ERROR_USER_NOT_FOUND) {
         /// Not regisgtered? then register
         print('Not registered. Going to register');
         return await register(data);
       } else {
-        await onPlatformException(e);
+        throw e;
       }
-    } catch (e) {
-      throw (e);
-      // await onCatch(e);
     }
   }
 }
