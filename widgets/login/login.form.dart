@@ -72,7 +72,7 @@ class _LoginFormState extends State<LoginForm> {
                 onPressed: () async {
                   try {
                     await auth.loginWithKakaotalkAccount();
-                    /// wordpress login.
+                    /// TODO: wordpress login.
                   } catch (e) {
                     print('e: $e');
                     AppService.alertError(e);
