@@ -41,30 +41,29 @@ class FlutterbaseAuthService {
 
   /// Sign in with Apple
   Future<User> loginWithAppleAccount() async {
-      final AuthorizationResult appleResult =
-          await AppleSignIn.performRequests([
-        AppleIdRequest(requestedScopes: [Scope.email, Scope.fullName])
-      ]);
+    final AuthorizationResult appleResult = await AppleSignIn.performRequests([
+      AppleIdRequest(requestedScopes: [Scope.email, Scope.fullName])
+    ]);
 
-      if (appleResult.error != null) {
-        print('Got apple login error:');
-        print(appleResult.error);
-        throw appleResult.error;
-      }
+    if (appleResult.error != null) {
+      print('Got apple login error:');
+      print(appleResult.error);
+      throw appleResult.error;
+    }
 
-      final AuthCredential credential = OAuthProvider('apple.com').credential(
-        accessToken:
-            String.fromCharCodes(appleResult.credential.authorizationCode),
-        idToken: String.fromCharCodes(appleResult.credential.identityToken),
-      );
+    final AuthCredential credential = OAuthProvider('apple.com').credential(
+      accessToken:
+          String.fromCharCodes(appleResult.credential.authorizationCode),
+      idToken: String.fromCharCodes(appleResult.credential.identityToken),
+    );
 
-      UserCredential firebaseResult =
-          await _auth.signInWithCredential(credential);
-      User user = firebaseResult.user;
+    UserCredential firebaseResult =
+        await _auth.signInWithCredential(credential);
+    User user = firebaseResult.user;
 
-      // Optional, Update user data in Firestore
-      // updateUserData(user);
-      return user;
+    // Optional, Update user data in Firestore
+    // updateUserData(user);
+    return user;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -81,34 +80,34 @@ class FlutterbaseAuthService {
   ///
   /// @note If the user cancels, then `null` is returned
   Future<User> loginWithGoogleAccount() async {
-      final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) {
-        return null;
-      }
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+    final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
+    if (googleUser == null) {
+      return null;
+    }
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
 
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
 
-      UserCredential authResult = await _auth.signInWithCredential(credential);
+    UserCredential authResult = await _auth.signInWithCredential(credential);
 
-      final User user = authResult.user;
+    final User user = authResult.user;
 
-      print("signed in " + user.displayName);
-      print(user);
+    print("signed in " + user.displayName);
+    print(user);
 
-      // saveOrUpdateFirebaseUser(user);
+    // saveOrUpdateFirebaseUser(user);
 
-      /// 파이어베이스에서 이미 로그인을 했으므로, GoogleSignIn 에서는 바로 로그아웃을 한다.
-      /// GoogleSignIn 에서 로그아웃을 안하면, 다음에 로그인을 할 때, 다른 계정으로 로그인을 못한다.
-      /// Logout immediately from `Google` so, the user can choose another
-      /// Google account on next login.
-      await _googleSignIn.signOut();
+    /// 파이어베이스에서 이미 로그인을 했으므로, GoogleSignIn 에서는 바로 로그아웃을 한다.
+    /// GoogleSignIn 에서 로그아웃을 안하면, 다음에 로그인을 할 때, 다른 계정으로 로그인을 못한다.
+    /// Logout immediately from `Google` so, the user can choose another
+    /// Google account on next login.
+    await _googleSignIn.signOut();
 
-      return user;
+    return user;
   }
 
   /// Login with Facebook Account
@@ -130,11 +129,11 @@ class FlutterbaseAuthService {
     );
 
     if (result == null) throw FAILED_ON_FACEBOOK_LOGIN;
-      final facebookAuthCred = FacebookAuthProvider.credential(result);
-      final UserCredential authResult =
-          await _auth.signInWithCredential(facebookAuthCred);
-      print(authResult.user);
-      return authResult.user;
+    final facebookAuthCred = FacebookAuthProvider.credential(result);
+    final UserCredential authResult =
+        await _auth.signInWithCredential(facebookAuthCred);
+    // print(authResult.user);
+    return authResult.user;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -153,57 +152,57 @@ class FlutterbaseAuthService {
     /// 카카오톡 로그인을 경우, 상황에 따라 메일 주소가 없을 수 있다. 메일 주소가 필수 항목이 아닌 경우,
     /// 따라서, id 로 메일 주소를 만들어서, 자동 회원 가입을 한다.
     ///
-      /// 카카오톡 앱이 핸드폰에 설치되었는가?
-      /// See if kakaotalk is installed on the phone.
-      final installed = await isKakaoTalkInstalled();
+    /// 카카오톡 앱이 핸드폰에 설치되었는가?
+    /// See if kakaotalk is installed on the phone.
+    final installed = await isKakaoTalkInstalled();
 
-      /// login with kakaotalk.
-      /// - If Kakotalk app is installed, then login with the Kakaotalk App.
-      /// - Otherwise, login with webview.
-      /// 카카오톡 앱이 설치 되었으면, 앱으로 로그인, 아니면 OAuth 로 로그인.
-      final authCode = installed
-          ? await AuthCodeClient.instance.requestWithTalk()
-          : await AuthCodeClient.instance.request();
+    /// login with kakaotalk.
+    /// - If Kakotalk app is installed, then login with the Kakaotalk App.
+    /// - Otherwise, login with webview.
+    /// 카카오톡 앱이 설치 되었으면, 앱으로 로그인, 아니면 OAuth 로 로그인.
+    final authCode = installed
+        ? await AuthCodeClient.instance.requestWithTalk()
+        : await AuthCodeClient.instance.request();
 
-      AccessTokenResponse token =
-          await AuthApi.instance.issueAccessToken(authCode);
+    AccessTokenResponse token =
+        await AuthApi.instance.issueAccessToken(authCode);
 
-      /// Store access token in AccessTokenStore for future API requests.
-      /// 이걸 해야지, 아래에서 UserApi.instance.me() 와 같이 호출을 할 수 있나??
-      AccessTokenStore.instance.toStore(token);
+    /// Store access token in AccessTokenStore for future API requests.
+    /// 이걸 해야지, 아래에서 UserApi.instance.me() 와 같이 호출을 할 수 있나??
+    AccessTokenStore.instance.toStore(token);
 
-      ////
-      String refreshedToken = token.refreshToken;
-      print('----> refreshedToken: $refreshedToken');
+    ////
+    String refreshedToken = token.refreshToken;
+    print('----> refreshedToken: $refreshedToken');
 
-      /// Get Kakaotalk user info
-      kakao.User user = await kakao.UserApi.instance.me();
-      print(user.properties);
-      Map<String, String> data = {
-        'email': AppService.getKakaoEmail(user),
-        'password': 'Settings.secretKey+${user.id}',
-        'displayName': user.properties['nickname'],
-        'photoUrl': user.properties['profile_image'],
-      };
+    /// Get Kakaotalk user info
+    kakao.User user = await kakao.UserApi.instance.me();
+    print(user.properties);
+    Map<String, String> data = {
+      'email': AppService.getKakaoEmail(user),
+      'password': 'Settings.secretKey+${user.id}',
+      'displayName': user.properties['nickname'],
+      'photoUrl': user.properties['profile_image'],
+    };
 
-      print('----> kakaotalk login success: $data');
+    print('----> kakaotalk login success: $data');
 
-      /// login or register into Firebase.
-      return loginOrRegisterIntoFirebase(data);
-      // _controller.update(['user']);
+    /// login or register into Firebase.
+    return loginOrRegisterIntoFirebase(data);
+    // _controller.update(['user']);
   }
 
   //////////////////////////////////////////////////////////////////////////////
   ///
   /// Login with custom token
   Future<UserCredential> loginWithToken(String customToken) async {
-      final UserCredential authResult =
-          await _auth.signInWithCustomToken(customToken);
+    final UserCredential authResult =
+        await _auth.signInWithCustomToken(customToken);
 
-      print('loginWithToken::authResult ===>>>');
-      print(authResult);
+    print('loginWithToken::authResult ===>>>');
+    print(authResult);
 
-      return authResult;
+    return authResult;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -211,10 +210,10 @@ class FlutterbaseAuthService {
   /// Link other credential to existing firebase account
   Future<UserCredential> linkCredential(AuthCredential credential) async {
     print(credential);
-      final UserCredential authResult =
-          await _auth.currentUser.linkWithCredential(credential);
-      print('linkCredential::authResult ===>>>');
-      return authResult;
+    final UserCredential authResult =
+        await _auth.currentUser.linkWithCredential(credential);
+    print('linkCredential::authResult ===>>>');
+    return authResult;
   }
 
   /// 사용자 로그아웃을 하고 `notifyListeners()` 를 한다. `user` 는 Listeners 에서 자동 업데이트된다.
@@ -331,7 +330,6 @@ class FlutterbaseAuthService {
   //   throw e;
   // }
 
-
   // onCatch(e) async {
   //   throw e;
   // }
@@ -349,12 +347,10 @@ class FlutterbaseAuthService {
       await login(data['email'], data['password']);
       print('loggedIn!');
 
-
       data.remove('email');
       data.remove('password');
-    // print('Going to update profile after login: data: ${data}');
-    return await profileUpdate(data);
-
+      // print('Going to update profile after login: data: ${data}');
+      return await profileUpdate(data);
     } catch (e) {
       if (e.code == FIREBASE_ERROR_USER_NOT_FOUND) {
         /// Not regisgtered? then register
