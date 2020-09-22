@@ -1,13 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterpress/flutterbase_v2/flutterbase.auth.service.dart';
-import 'package:get/get.dart';
-import 'package:country_code_picker/country_code_picker.dart';
+import 'package:flutterpress/flutterbase_v2/widgets/social_login/country_code_select.dart';
 
 class PhoneAuthForm extends StatefulWidget {
   final Function onVerified;
+  final Function onError;
 
-  PhoneAuthForm({this.onVerified(String phoneNo)});
+  PhoneAuthForm({this.onVerified(String phoneNo), this.onError(dynamic error)});
 
   @override
   _PhoneAuthFormState createState() => _PhoneAuthFormState();
@@ -39,31 +39,22 @@ class _PhoneAuthFormState extends State<PhoneAuthForm> {
         Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  CountryCodePicker(
-                    onChanged: (_) {
-                      code = _.dialCode;
-                      print(code);
-                    },
-                    initialSelection: code,
-                    showCountryOnly: false,
-                    showOnlyCountryWhenClosed: false,
-                    alignLeft: false,
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: TextFormField(
-                      keyboardType: TextInputType.phone,
-                      textInputAction: TextInputAction.done,
-                      readOnly: isCodeSent,
-                      controller: _phoneController,
-                      decoration:
-                          InputDecoration(labelText: 'Input phone number'),
-                    ),
-                  ),
-                ],
+              Text('Select country code'),
+              CountryCodeSelect(
+                enabled: !isCodeSent,
+                initialSelection: code,
+                onChanged: (_) {
+                  code = _.dialCode;
+                },
+              ),
+              TextFormField(
+                keyboardType: TextInputType.phone,
+                textInputAction: TextInputAction.done,
+                readOnly: isCodeSent,
+                controller: _phoneController,
+                decoration: InputDecoration(labelText: 'Mobile number'),
               ),
               SizedBox(height: isCodeSent ? 20 : 10),
               if (isCodeSent)
@@ -73,31 +64,22 @@ class _PhoneAuthFormState extends State<PhoneAuthForm> {
                   controller: _codeController,
                   decoration: InputDecoration(labelText: 'Verification Code'),
                 ),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  FlatButton(
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(color: Colors.red[500]),
-                    ),
-                    onPressed: () {
-                      Get.back();
-                    },
+              SizedBox(height: 30),
+              SizedBox(
+                width: double.infinity,
+                child: FlatButton(
+                  padding: EdgeInsets.symmetric(vertical: 15),
+                  child: Text(
+                    isCodeSent ? 'Verify Code' : 'Send Code',
+                    style: TextStyle(color: Colors.white, fontSize: 24),
                   ),
-                  Spacer(),
-                  FlatButton(
-                    child: Text(
-                      isCodeSent ? 'Verify' : 'Submit',
-                      style: TextStyle(color: Colors.green[500]),
-                    ),
-                    onPressed: isCodeSent
-                        ? () => verifyCode(verificationID, _codeController.text)
-                        : () =>
-                            verifyPhoneNumber('$code${_phoneController.text}'),
-                  )
-                ],
-              )
+                  color: Colors.blueAccent,
+                  onPressed: isCodeSent
+                      ? () => verifyCode(verificationID, _codeController.text)
+                      : () =>
+                          verifyPhoneNumber('$code${_phoneController.text}'),
+                ),
+              ),
             ],
           ),
         )
@@ -113,7 +95,10 @@ class _PhoneAuthFormState extends State<PhoneAuthForm> {
 
     print('credential');
     print(credential);
+    linkPhoneAuthCredentials(credential);
+  }
 
+  linkPhoneAuthCredentials(AuthCredential credential) async {
     try {
       UserCredential authResult = await _auth.linkCredential(credential);
       print('verify::authResult ===>');
@@ -121,7 +106,7 @@ class _PhoneAuthFormState extends State<PhoneAuthForm> {
       widget.onVerified(authResult.user.phoneNumber);
     } catch (e) {
       print('verify Error');
-      print(e);
+      widget.onError(e);
     }
   }
 
@@ -132,20 +117,22 @@ class _PhoneAuthFormState extends State<PhoneAuthForm> {
     _fbAuth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
 
-      /// called after the verification process is complete
+      /// this will only be called after the automatic code retrieval is performed.
+      /// some phone may have the automatic code retrieval. some may not.
       verificationCompleted: (PhoneAuthCredential credential) async {
         print(
           'automatic verification code retrieval from received sms happened!',
         );
         print('credential :');
         print(credential);
+        linkPhoneAuthCredentials(credential);
       },
 
       /// called whenever error happens
       verificationFailed: (FirebaseAuthException e) {
         print('verificationFailed');
         print(e);
-        // onError(e);
+        widget.onError(e);
       },
 
       /// called after the user submitted the phone number.
