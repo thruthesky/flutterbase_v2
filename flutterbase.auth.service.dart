@@ -1,5 +1,4 @@
 import 'package:apple_sign_in/apple_sign_in.dart';
-import 'package:flutterpress/services/app.service.dart';
 
 import '../flutter_library/library.dart';
 import '../flutterbase_v2/flutterbase.controller.dart';
@@ -179,7 +178,7 @@ class FlutterbaseAuthService {
     kakao.User user = await kakao.UserApi.instance.me();
     print(user.properties);
     Map<String, String> data = {
-      'email': AppService.getKakaoEmail(user),
+      'email': getKakaoEmail(user),
       'password': 'Settings.secretKey+${user.id}',
       'displayName': user.properties['nickname'],
       'photoUrl': user.properties['profile_image'],
@@ -361,6 +360,19 @@ class FlutterbaseAuthService {
       }
     }
   }
+
+
+  /// Returns an email address for Kakao login.
+  String getKakaoEmail(user) {
+    String email;
+    if (user.properties['email'] != null) {
+      email = user.properties['email'];
+    } else {
+      email = 'kakaotalk${user.id}@kakao.com';
+    }
+    return email;
+  }
+
 }
 
 /// A Custom WebView Widget For Facebook Login
